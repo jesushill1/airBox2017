@@ -41,6 +41,7 @@ void main()
 {
 
 	// Initialization
+	
 	//_pac=0b11101000;
 	//_pbc=0b11000000;
 	_pcc2=0;				// enable the background light output pin
@@ -100,7 +101,11 @@ void main()
 
 void isr_psc()
 {	
+	// clear interrupt flag
 	_tb0f	= 0;
+	
+	// reset watchdog
+	_clrwdt();
 	
 	LcdRefresh();
 	return;
