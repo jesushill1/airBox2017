@@ -3,6 +3,7 @@
 #define     TOUCH_IOPU   _pcpu4
 #define     TOUCH_IOC    _pcc4
 #define     TOUCH_IO     _pc4                            //TOUCH按键状态输出脚
+#define     LIGHT        _pc2
 //==================================================
 #define     COM0         _pa1
 #define     COM1         _pa4
@@ -23,7 +24,7 @@ volatile unsigned char  rx_time_cnt;
 volatile unsigned char  com_status;
 volatile unsigned char  dis_data[4];
 volatile unsigned char  data_buffer;
-
+unsigned int key1;
 volatile flag_type gv8u_flag1;
 #define  key_press_flag   gv8u_flag1.bits.bit0
 #define  rx_first_flag    gv8u_flag1.bits.bit1
@@ -34,6 +35,7 @@ volatile flag_type gv8u_flag1;
 //=====CTM0定时器中断===============
 DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
 {
+	return;
 	if(rx_time_cnt<4)
 	{
 		rx_time_cnt++;
@@ -149,12 +151,15 @@ void USER_PROGRAM_INITIAL()
 	
 	_pcpu=0;
 	_pc=0;
-	_pcc=0xff;	
+	_pcc=0b11111011;    // pc0: NC
+                        // pc1: touch input
+                        // pc2: light output
+                        // pc3: DHT
+                        // pc4: NC
+                        // pc5: RXD2
+                        // pc6: FAN feedback
+                        // pc7: TXD2
 	
-	_pdpu=0;
-	_pd=0;
-	_pdc=0xc0;	
-  	
 	//=====CTM0初始化============
 	_ctm0c0=0x20;   //fsys/16
 	_ctm0c1=0xc1;
@@ -176,10 +181,10 @@ void USER_PROGRAM_INITIAL()
 	_slcdc1=0b00111111;                   //SSEG0~SSEG5使能
 	_slcdc2=0b00000000;
 	_slcdc3=0b00000000;
-	dis_data[0]=0x00;
-		dis_data[1]=0x00;
-			dis_data[2]=0x00;
-				dis_data[3]=0x00;
+    dis_data[0]=0x00;
+    dis_data[1]=0x00;
+    dis_data[2]=0x00;
+    dis_data[3]=0x00;
 }
 //==============================================
 //**********************************************
@@ -213,20 +218,18 @@ void USER_PROGRAM()
    		GET_KEY_BITMAP();
    		if(key_press_flag==0)
    		{
-			if(DATA_BUF[0]&&0x80)	
+			if(DATA_BUF[1]&0b00000010)	
 			{
 				key_press_flag=1;
-				TOUCH_IO=0; 
-				TOUCH_IOC=0;                   //有按键，输出0  
+                LIGHT = 1;
 			}	
    		}
 		else 
 		{
-			if(DATA_BUF[0]==0)	
+			if(DATA_BUF[1]==0)	
 			{
 				key_press_flag=0; 
-				TOUCH_IOPU=1;
-				TOUCH_IOC=1;                   //无按键，输入上拉
+                LIGHT = 0;
 			}
 		}
     }

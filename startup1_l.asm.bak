@@ -2,8 +2,8 @@
 ;;    This file is part of the Holtek C Compiler V3 package     ;;
 ;;    For the initialization of static linkage variables        ;;
 ;;    Copyright (C) 2013 Holtek Semiconductor Inc.              ;;
-;;    Version: 1.04 (Above IDE3000 V7.72)                       ;;
-;;    Date:    2013/12/04                                        ;;
+;;    Version: 1.05 (Above IDE3000 V7.92)                       ;;
+;;    Date:    2016/08/24                                        ;;
 ;;--------------------------------------------------------------;;
 
 acc equ [05h]
@@ -34,7 +34,11 @@ next_table:
   inc tblp
   sz z
   inc tbhp
+ifdef USE_TABRD
+  tabrd mp0
+else
   tabrdc mp0
+endif
   sz mp0
   jmp read_data
   jmp end_startup_value
@@ -42,14 +46,22 @@ read_data:
   inc tblp
   sz z
   inc tbhp
+ifdef USE_TABRD
+  tabrd mp1l
+else
   tabrdc mp1l
+endif
   mov a,tblh
   mov mp1h,a
 next_data:
   inc tblp
   sz z
   inc tbhp
+ifdef USE_TABRD
+  tabrd acc
+else
   tabrdc acc
+endif
   mov r1,a
   sdz mp0
   jmp $+2

@@ -79,7 +79,7 @@ INCLUDE BS82C16A-3.INC
 ;---------------------------------
 ;-DEFINE PIN AS I/O OR TOUCH INPUT
 ;---------------------------------
-#define IO_TOUCH_ATTR           00000000000000000000000010000000B;0=IO ; 1=TOUCH INPUT
+#define IO_TOUCH_ATTR           00000000000000000000001000000000B;0=IO ; 1=TOUCH INPUT
                            ;KEY 3   ~   2 ~ 2 ~ 1 ~ 1 ~ 0 ~ 0 ~0 ;KEY32~KEY1
                            ;    2       4   0   6   2   8   4  1
 
