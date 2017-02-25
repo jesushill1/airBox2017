@@ -1,0 +1,3085 @@
+				;file C:\Users\JunZh\Desktop\Projects\2017_ 空气盒\开发环境和硬件验证代码\BS82C16A_示例程序\BS82C16A_20150807_LIBV413--V3\20150807_LIBV413\MAIN_PROGRAM_V102\MAIN_PROGRAM_V102.asm
+				;1	
+				;2	message '****************************************************************'
+				;3	message '*PROJECT NAME :MAIN PROGRAM V102                               *'
+				;4	message '*     VERSION :V102                                            *'
+				;5	message '* ICE VERSION :                                                *'
+				;6	message '*      DATE   :20150317                                        *'
+				;7	message '*      REMARK :V102 modify ESCpowerIDcheck2,PBP                *'
+				;8	message '****************************************************************'
+				;9	                ;=INCLUDE REFERENCE FILE
+				;10	                INCLUDE MAIN_PROGRAM_V102.INC
+				;11	
+				;12	                ;-PUBLIC LABEL
+				;13	                PUBLIC  _LOAD_TKS_GLOBE_VARIES
+				;14	                PUBLIC  _LOAD_HXT_REFERENCE
+				;15	
+				;16	CALL_   MACRO   FUNCTION
+				;17	        ifdef   FUNCTION
+				;18	                ifdef   PBP
+				;19	                MOV     A,bank FUNCTION
+				;20	                MOV     PBP,A
+				;21	                endif
+				;22	                CALL    FUNCTION
+				;23	        endif
+				;24	                ENDM
+				;25	
+				;26	EXTEND_FUNCTION_INITIAL MACRO
+				;27	                CALL_   EXTEND_FUNCTION_1A_INITIAL
+				;28	                CALL_   EXTEND_FUNCTION_1B_INITIAL
+				;29	                CALL_   EXTEND_FUNCTION_1C_INITIAL
+				;30	                CALL_   EXTEND_FUNCTION_1D_INITIAL
+				;31	                CALL_   EXTEND_FUNCTION_1E_INITIAL
+				;32	                CALL_   EXTEND_FUNCTION_1F_INITIAL
+				;33	                CALL_   EXTEND_FUNCTION_1G_INITIAL
+				;34	                CALL_   EXTEND_FUNCTION_1H_INITIAL
+				;35	
+				;36	                CALL_   EXTEND_FUNCTION_2A_INITIAL
+				;37	                CALL_   EXTEND_FUNCTION_2B_INITIAL
+				;38	                CALL_   EXTEND_FUNCTION_2C_INITIAL
+				;39	                CALL_   EXTEND_FUNCTION_2D_INITIAL
+				;40	                CALL_   EXTEND_FUNCTION_2E_INITIAL
+				;41	                CALL_   EXTEND_FUNCTION_2F_INITIAL
+				;42	                CALL_   EXTEND_FUNCTION_2G_INITIAL
+				;43	                CALL_   EXTEND_FUNCTION_2H_INITIAL
+				;44	                ENDM
+				;45	
+				;46	EXTEND_FUNCTION MACRO
+				;47	                CALL_   EXTEND_FUNCTION_1A
+				;48	                CALL_   EXTEND_FUNCTION_1B
+				;49	                CALL_   EXTEND_FUNCTION_1C
+				;50	                CALL_   EXTEND_FUNCTION_1D
+				;51	                CALL_   EXTEND_FUNCTION_1E
+				;52	                CALL_   EXTEND_FUNCTION_1F
+				;53	                CALL_   EXTEND_FUNCTION_1G
+				;54	                CALL_   EXTEND_FUNCTION_1H
+				;55	
+				;56	                CALL_   EXTEND_FUNCTION_2A
+				;57	                CALL_   EXTEND_FUNCTION_2B
+				;58	                CALL_   EXTEND_FUNCTION_2C
+				;59	                CALL_   EXTEND_FUNCTION_2D
+				;60	                CALL_   EXTEND_FUNCTION_2E
+				;61	                CALL_   EXTEND_FUNCTION_2F
+				;62	                CALL_   EXTEND_FUNCTION_2G
+				;63	                CALL_   EXTEND_FUNCTION_2H
+				;64	                ENDM
+				;65	                ;==============
+				;66	                ;=DATA SETCTION
+				;67	                ;==============
+				;68	MAIN_DATA       .SECTION          'DATA'
+				;69	
+				;70	ifndef  ESCpowerIDcheck
+				;71	POR_ID          DB      2 DUP(?)
+				;72	endif
+				;73	
+				;74	
+				;75	
+				;76	                ;==============
+				;77	                ;=CODE SETCTION
+				;78	                ;==============
+				;79	PROGRAM_ENTRY   .SECTION  AT 000H 'CODE'
+				;80	        ifdef   PBP
+				;81	                CLR     PBP
+				;82	                ifndef  ESCpowerIDcheck
+				;83	                MOV     A,042H      ;ASCII = B
+				;84	                endif
+				;85	        else
+				;86	                ;----------------
+				;87	                ;-SET POR ID 1---
+				;88	                ;----------------
+				;89	                ifndef  ESCpowerIDcheck
+				;90	                MOV     A,042H      ;ASCII = B
+				PROGRAM_ENTRY:
+				include BS82C16A-3.inc
+0000	0F42	mov     a, 42H
+				;91	                SNZ     TO
+0001	3A8A	snz     TO
+				;92	                MOV     POR_ID[0],A
+0002	40AE	mov     POR_ID, a
+				;93	                endif
+				;94	        endif
+				;95	                JMP     PROGRAM_RESET
+0003	2830	jmp     PROGRAM_RESET
+0004	0000	nop
+0005	0000	nop
+0006	0000	nop
+0007	0000	nop
+					----
+					----
+000A	0000	nop
+000B	0000	nop
+					----
+					----
+					----
+					----
+0010	0000	nop
+0011	0000	nop
+0012	0000	nop
+0013	0000	nop
+				;96	
+				;97	                ;==============
+				;98	                ;=MAIN PROGRAM=
+				;99	                ;==============
+				;100	MAIN_PROGRAM    .SECTION          'CODE'
+				;101	
+				;102	                ;;***********************
+				;103	PROGRAM_RESET:  ;;* PROGRAM ENTRY *******
+				;104	                ;;***********************
+				;105	        ifdef   PBP
+				;106	                ifndef  ESCpowerIDcheck
+				;107	                SNZ     TO
+				;108	                MOV     POR_ID[0],A
+				;109	                endif
+				;110	        endif
+				;111	                ;----------------
+				;112	                ;-SET POR ID 2---
+				;113	                ;----------------
+				;114	        ifndef  ESCpowerIDcheck
+				;115	                MOV     A,053H      ;ASCII = S
+				@dummy44 .SECTION 'CODE'
+				PROGRAM_RESET:
+				MAIN_PROGRAM:
+0030	0F53	mov     a, 53H
+				;116	                MOV     POR_ID[1],A
+0031	40AF	mov     POR_ID[1], a
+				;117	        endif
+				;118	
+				;119	
+				;120	                ;---------------------
+				;121	                ;-MCU HARDWARE INITIAL
+				;122	                ;---------------------
+				;123	                MCU_HARDWARE_INITIAL
+0032	0F00	mov     a, 0H
+0033	00BD	mov     CTRL, a
+0034	0F03	mov     a, 3H
+0035	008B	mov     SMOD, a
+0036	0F52	mov     a, 52H
+0037	009A	mov     WDTC, a
+0038	0F03	mov     a, 3H
+0039	0084	mov     BP, a
+003A	0F80	mov     a, 80H
+003B	205F	call    CLEAR_RAM
+003C	0F02	mov     a, 2H
+003D	0084	mov     BP, a
+003E	0F80	mov     a, 80H
+003F	205F	call    CLEAR_RAM
+0040	0F01	mov     a, 1H
+0041	0084	mov     BP, a
+0042	0F80	mov     a, 80H
+0043	205F	call    CLEAR_RAM
+0044	1F04	clr     BP
+0045	0F80	mov     a, 80H
+0046	205F	call    CLEAR_RAM
+				;124	
+				;125	                ;------------------------------
+				;126	                ;-LOAD LIBRARY OPTION/THRESHOLD
+				;127	                ;------------------------------
+				;128	                CALL    _LOAD_TKS_GLOBE_VARIES
+0047	206C	call    _LOAD_HXT_REFERENCE
+				;129	
+				;130	                ;------------------------
+				;131	                ;-EXTEND FUNCTION INITIAL
+				;132	                ;------------------------
+				;133	                EXTEND_FUNCTION_INITIAL
+0048	2138	call    L0138
+0049	2622	call    _USER_PROGRAM_INITIAL
+				;134	
+				;135	                ;;-----------------------
+				;136	MAIN_LOOP:      ;;- MAIN PROGRAM LOOP ---
+				;137	                ;;-----------------------
+				;138	                CLR     WDT
+				MAIN_LOOP:
+004A	0001	clr     wdt
+				;139	                CLR     WDT1
+004B	0001	clr     wdt
+				;140	                CLR     WDT2
+004C	0005	clr     wdt2
+				;141	
+				;142	                ;----------------
+				;143	                ;-CHECK POR ID --
+				;144	                ;----------------
+				;145	        ifndef  ESCpowerIDcheck
+				;146	                MOV     A,042H
+004D	0F42	mov     a, 42H
+				;147	                XORM    A,POR_ID[0]
+004E	44AE	xorm    a, POR_ID
+				;148	                MOV     A,053H
+004F	0F53	mov     a, 53H
+				;149	                SZ      Z
+0050	3D0A	sz      Z
+				;150	                XORM    A,POR_ID[1]
+0051	44AF	xorm    a, POR_ID[1]
+				;151	                SNZ     Z
+0052	390A	snz     Z
+				;152	                JMP     000H
+0053	2800	jmp     PROGRAM_ENTRY
+				;153	        endif
+				;154	                ;----------------------
+				;155	                ;-RE INITIAL SYS. CLOCK
+				;156	                ;----------------------
+				;157	                RELOAD_SYS_CLOCK
+0054	0F00	mov     a, 0H
+0055	00BD	mov     CTRL, a
+0056	0F03	mov     a, 3H
+0057	008B	mov     SMOD, a
+				;158	                EXTEND_FUNCTION
+0058	2097	call    L0097
+0059	2018	call    _USER_PROGRAM
+				;159	                ;----------------
+				;160	                ;-SET POR ID  ---
+				;161	                ;----------------
+				;162	        ifndef  ESCpowerIDcheck
+				;163	                MOV     A,042H      ;ASCII = B
+005A	0F42	mov     a, 42H
+				;164	                MOV     POR_ID[0],A
+005B	40AE	mov     POR_ID, a
+				;165	                MOV     A,053H      ;ASCII = S
+005C	0F53	mov     a, 53H
+				;166	                MOV     POR_ID[1],A
+005D	40AF	mov     POR_ID[1], a
+				;167	        endif
+				;168	
+				;169	                ;--------------------
+				;170	WDT_WAKEUP:     ;-WDT WAKEUP FUNCTION
+				;171	                ;--------------------
+				;172	                if      PowerSave==1
+				;173	                CALL_   _CHECK_KEY_WAKEUP
+				;174	                endif
+				;175	
+				;176	                ifdef   PBP
+				;177	                MOV     A,BANK MAIN_LOOP
+				;178	                MOV     PBP,A
+				;179	                endif
+				;180	                JMP     MAIN_LOOP
+				WDT_WAKEUP:
+005E	284A	jmp     MAIN_LOOP
+				;181	
+				;182	
+				;183	
+				;184	
+				;185	
+				;186	
+				;187	
+				;188	
+				;189	
+				;190	;;***********************************************************
+				;191	;;*SUB. NAME:                                               *
+				;192	;;*INPUT    :                                               *
+				;193	;;*OUTPUT   :                                               *
+				;194	;;*USED REG.:                                               *
+				;195	;;*FUNCTION :                                               *
+				;196	;;***********************************************************
+				;197	CLEAR_RAM:
+				;198	                MOV     MP1,A
+				CLEAR_RAM:
+005F	0083	mov     MP1, a
+				;199	        ifndef  ESCpowerIDcheck
+				;200	            ifdef  BP
+				;201	                ;-CHECK BANK
+				;202	                SZ      BP
+0060	1084	sz      BP
+				;203	                JMP     CLR_RAM
+0061	2868	jmp     CLR_RAM
+				;204	            endif
+				;205	                ;-CHECK POR_ID RAM
+				;206	                MOV     A,OFFSET POR_ID
+0062	0FAE	mov     a, AEH
+				;207	                XOR     A,MP1
+0063	0403	xor     a, MP1
+				;208	                MOV     A,OFFSET POR_ID+1
+0064	0FAF	mov     a, AFH
+				;209	                SNZ     Z
+0065	390A	snz     Z
+				;210	                XOR     A,MP1
+0066	0403	xor     a, MP1
+				;211	                SNZ     Z
+0067	390A	snz     Z
+				;212	        endif
+				;213	CLR_RAM:        ;-CLEAR RAM
+				;214	                CLR     IAR1
+				CLR_RAM:
+0068	1F02	clr     [02H]
+				;215	                SIZA    MP1
+0069	1603	siza    MP1
+				;216	                JMP     CLEAR_RAM
+006A	285F	jmp     CLEAR_RAM
+				;217	
+				;218	                RET
+006B	0003	ret
+				;219	
+				;220	
+				;221	;;***********************************************************
+				;222	;;*SUB. NAME:                                               *
+				;223	;;*INPUT    :                                               *
+				;224	;;*OUTPUT   :                                               *
+				;225	;;*USED REG.:                                               *
+				;226	;;*FUNCTION :                                               *
+				;227	;;***********************************************************
+				;228	_LOAD_TKS_GLOBE_VARIES:
+				;229	_LOAD_HXT_REFERENCE:
+				;230	                ;------------------------
+				;231	                ;-SET TKS LIBRARY OPTION-
+				;232	                ;------------------------
+				;233	                MOV     A,GlobeOptionA
+				_LOAD_HXT_REFERENCE:
+				_LOAD_TKS_GLOBE_VARIES:
+006C	0F72	mov     a, 72H
+				;234	                MOV     _GLOBE_VARIES[0],A
+006D	4080	mov     __ctm0ah[26], a
+				;235	                MOV     A,GlobeOptionB
+006E	0FF0	mov     a, F0H
+				;236	                MOV     _GLOBE_VARIES[1],A
+006F	4081	mov     __ctm0ah[27], a
+				;237	                MOV     A,GlobeOptionC
+0070	0F98	mov     a, 98H
+				;238	                MOV     _GLOBE_VARIES[2],A
+0071	4082	mov     __ctm0ah[28], a
+				;239	
+				;240	                ;--------------------------
+				;241	                ;-SET TOUCH OR IO ATTRIBUTE
+				;242	                ;--------------------------
+				;243	                MOV     A,IO_TOUCH_ATTR&0FFH
+0072	0F80	mov     a, 80H
+				;244	                MOV     _KEY_IO_SEL[0],A
+0073	409E	mov     __ctm0ah[56], a
+				;245	                ;-IF OVER 2 TOUCH IP (8~16KEY)
+				;246	                if      TouchKeyAmount > 8
+				;247	                MOV     A,(IO_TOUCH_ATTR>>8)&0FFH
+0074	0F00	mov     a, 0H
+				;248	                MOV     _KEY_IO_SEL[1],A
+0075	409F	mov     __ctm0ah[57], a
+				;249	                endif
+				;250	                ;-IF OVER 4 TOUCH IP (17~24KEY)
+				;251	                if      TouchKeyAmount > 16
+				;252	                MOV     A,(IO_TOUCH_ATTR>>16)&0FFH
+				;253	                MOV     _KEY_IO_SEL[2],A
+				;254	                endif
+				;255	                ;-IF OVER 6 TOUCH IP (25~32KEY)
+				;256	                if      TouchKeyAmount > 24
+				;257	                MOV     A,(IO_TOUCH_ATTR>>24)&0FFH
+				;258	                MOV     _KEY_IO_SEL[3],A
+				;259	                endif
+				;260	
+				;261	                ;------------------------
+				;262	                ;-SET TOUCH KEY THRESHOLD
+				;263	                ;------------------------
+				;264	                ;-KEY1 THRESHOLD
+				;265	                MOV     A,Key1Threshold
+0076	0F10	mov     a, 10H
+				;266	                MOV     _GLOBE_VARIES[3],A
+0077	4083	mov     __ctm0ah[29], a
+				;267	
+				;268	                if      TouchKeyAmount > 1
+				;269	                ;-KEY2 THRESHOLD
+				;270	                MOV     A,Key2Threshold
+0078	0F10	mov     a, 10H
+				;271	                MOV     _GLOBE_VARIES[4],A
+0079	4084	mov     __ctm0ah[30], a
+				;272	                endif
+				;273	
+				;274	                if      TouchKeyAmount > 2
+				;275	                ;-KEY3 THRESHOLD
+				;276	                MOV     A,Key3Threshold
+007A	0F10	mov     a, 10H
+				;277	                MOV     _GLOBE_VARIES[5],A
+007B	4085	mov     __ctm0ah[31], a
+				;278	                endif
+				;279	
+				;280	                if      TouchKeyAmount > 3
+				;281	                ;-KEY4 THRESHOLD
+				;282	                MOV     A,Key4Threshold
+007C	0F10	mov     a, 10H
+				;283	                MOV     _GLOBE_VARIES[6],A
+007D	4086	mov     __ctm0ah[32], a
+				;284	                endif
+				;285	
+				;286	                if      TouchKeyAmount > 4
+				;287	                ;-KEY5 THRESHOLD
+				;288	                MOV     A,Key5Threshold
+007E	0F10	mov     a, 10H
+				;289	                MOV     _GLOBE_VARIES[7],A
+007F	4087	mov     __ctm0ah[33], a
+				;290	                endif
+				;291	
+				;292	                if      TouchKeyAmount > 5
+				;293	                ;-KEY6 THRESHOLD
+				;294	                MOV     A,Key6Threshold
+0080	0F10	mov     a, 10H
+				;295	                MOV     _GLOBE_VARIES[8],A
+0081	4088	mov     __ctm0ah[34], a
+				;296	                endif
+				;297	
+				;298	                if      TouchKeyAmount > 6
+				;299	                ;-KEY7 THRESHOLD
+				;300	                MOV     A,Key7Threshold
+0082	0F10	mov     a, 10H
+				;301	                MOV     _GLOBE_VARIES[9],A
+0083	4089	mov     __ctm0ah[35], a
+				;302	                endif
+				;303	
+				;304	                if      TouchKeyAmount > 7
+				;305	                ;-KEY8 THRESHOLD
+				;306	                MOV     A,Key8Threshold
+0084	0F10	mov     a, 10H
+				;307	                MOV     _GLOBE_VARIES[10],A
+0085	408A	mov     __ctm0ah[36], a
+				;308	                endif
+				;309	
+				;310	                if     TouchKeyAmount > 8
+				;311	                ;-KEY9 THRESHOLD
+				;312	                MOV     A,Key9Threshold
+0086	0F10	mov     a, 10H
+				;313	                MOV     _GLOBE_VARIES[11],A
+0087	408B	mov     __ctm0ah[37], a
+				;314	                endif
+				;315	
+				;316	                if      TouchKeyAmount > 9
+				;317	                ;-KEY10 THRESHOLD
+				;318	                MOV     A,Key10Threshold
+0088	0F10	mov     a, 10H
+				;319	                MOV     _GLOBE_VARIES[12],A
+0089	408C	mov     __ctm0ah[38], a
+				;320	                endif
+				;321	
+				;322	                if      TouchKeyAmount > 10
+				;323	                ;-KEY11 THRESHOLD
+				;324	                MOV     A,Key11Threshold
+008A	0F10	mov     a, 10H
+				;325	                MOV     _GLOBE_VARIES[13],A
+008B	408D	mov     __ctm0ah[39], a
+				;326	                endif
+				;327	
+				;328	                if      TouchKeyAmount > 11
+				;329	                ;-KEY12 THRESHOLD
+				;330	                MOV     A,Key12Threshold
+008C	0F10	mov     a, 10H
+				;331	                MOV     _GLOBE_VARIES[14],A
+008D	408E	mov     __ctm0ah[40], a
+				;332	                endif
+				;333	
+				;334	                if      TouchKeyAmount > 12
+				;335	                ;-KEY13 THRESHOLD
+				;336	                MOV     A,Key13Threshold
+008E	0F10	mov     a, 10H
+				;337	                MOV     _GLOBE_VARIES[15],A
+008F	408F	mov     __ctm0ah[41], a
+				;338	                endif
+				;339	
+				;340	                if      TouchKeyAmount > 13
+				;341	                ;-KEY14 THRESHOLD
+				;342	                MOV     A,Key14Threshold
+0090	0F10	mov     a, 10H
+				;343	                MOV     _GLOBE_VARIES[16],A
+0091	4090	mov     __ctm0ah[42], a
+				;344	                endif
+				;345	
+				;346	                if      TouchKeyAmount > 14
+				;347	                ;-KEY15 THRESHOLD
+				;348	                MOV     A,Key15Threshold
+0092	0F10	mov     a, 10H
+				;349	                MOV     _GLOBE_VARIES[17],A
+0093	4091	mov     __ctm0ah[43], a
+				;350	                endif
+				;351	
+				;352	                if      TouchKeyAmount > 15
+				;353	                ;-KEY16 THRESHOLD
+				;354	                MOV     A,Key16Threshold
+0094	0F10	mov     a, 10H
+				;355	                MOV     _GLOBE_VARIES[18],A
+0095	4092	mov     __ctm0ah[44], a
+				;356	                endif
+				;357	
+				;358	                if      TouchKeyAmount > 16
+				;359	                ;-KEY17 THRESHOLD
+				;360	                MOV     A,Key17Threshold
+				;361	                MOV     _GLOBE_VARIES[19],A
+				;362	                endif
+				;363	
+				;364	                if      TouchKeyAmount > 17
+				;365	                ;-KEY18 THRESHOLD
+				;366	                MOV     A,Key18Threshold
+				;367	                MOV     _GLOBE_VARIES[20],A
+				;368	                endif
+				;369	
+				;370	                if      TouchKeyAmount > 18
+				;371	                ;-KEY19 THRESHOLD
+				;372	                MOV     A,Key19Threshold
+				;373	                MOV     _GLOBE_VARIES[21],A
+				;374	                endif
+				;375	
+				;376	                if      TouchKeyAmount > 19
+				;377	                ;-KEY20 THRESHOLD
+				;378	                MOV     A,Key20Threshold
+				;379	                MOV     _GLOBE_VARIES[22],A
+				;380	                endif
+				;381	
+				;382	                if      TouchKeyAmount > 20
+				;383	                ;-KEY17 THRESHOLD
+				;384	                MOV     A,Key21Threshold
+				;385	                MOV     _GLOBE_VARIES[23],A
+				;386	                endif
+				;387	
+				;388	                if      TouchKeyAmount > 21
+				;389	                ;-KEY18 THRESHOLD
+				;390	                MOV     A,Key22Threshold
+				;391	                MOV     _GLOBE_VARIES[24],A
+				;392	                endif
+				;393	
+				;394	                if      TouchKeyAmount > 22
+				;395	                ;-KEY19 THRESHOLD
+				;396	                MOV     A,Key23Threshold
+				;397	                MOV     _GLOBE_VARIES[25],A
+				;398	                endif
+				;399	
+				;400	                if      TouchKeyAmount > 23
+				;401	                ;-KEY20 THRESHOLD
+				;402	                MOV     A,Key24Threshold
+				;403	                MOV     _GLOBE_VARIES[26],A
+				;404	                endif
+				;405	
+				;406	                if      TouchKeyAmount > 24
+				;407	                ;-KEY17 THRESHOLD
+				;408	                MOV     A,Key25Threshold
+				;409	                MOV     _GLOBE_VARIES[27],A
+				;410	                endif
+				;411	
+				;412	                if      TouchKeyAmount > 25
+				;413	                ;-KEY18 THRESHOLD
+				;414	                MOV     A,Key26Threshold
+				;415	                MOV     _GLOBE_VARIES[28],A
+				;416	                endif
+				;417	
+				;418	                if      TouchKeyAmount > 26
+				;419	                ;-KEY19 THRESHOLD
+				;420	                MOV     A,Key27Threshold
+				;421	                MOV     _GLOBE_VARIES[29],A
+				;422	                endif
+				;423	
+				;424	                if      TouchKeyAmount > 27
+				;425	                ;-KEY20 THRESHOLD
+				;426	                MOV     A,Key28Threshold
+				;427	                MOV     _GLOBE_VARIES[30],A
+				;428	                endif
+				;429	
+				;430	                if      TouchKeyAmount > 28
+				;431	                ;-KEY29 THRESHOLD
+				;432	                MOV     A,Key29Threshold
+				;433	                MOV     _GLOBE_VARIES[31],A
+				;434	                endif
+				;435	
+				;436	                if      TouchKeyAmount > 29
+				;437	                ;-KEY30 THRESHOLD
+				;438	                MOV     A,Key30Threshold
+				;439	                MOV     _GLOBE_VARIES[32],A
+				;440	                endif
+				;441	
+				;442	                if      TouchKeyAmount > 30
+				;443	                ;-KEY31 THRESHOLD
+				;444	                MOV     A,Key31Threshold
+				;445	                MOV     _GLOBE_VARIES[33],A
+				;446	                endif
+				;447	
+				;448	                if      TouchKeyAmount > 31
+				;449	                ;-KEY32 THRESHOLD
+				;450	                MOV     A,Key32Threshold
+				;451	                MOV     _GLOBE_VARIES[34],A
+				;452	                endif
+				;453	
+				;454	
+				;455	                RET
+0096	0003	ret
+				L0097:
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+				L0138:
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+				L054A:
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+					----
+				;456	
+				;457	
+				;458	
+				;459	
+				;460	                END
+				;461	
+				;462	
+				;463	
+				;file C:\Users\JunZh\Desktop\Projects\2017_ 空气盒\开发环境和硬件验证代码\BS82C16A_示例程序\BS82C16A_20150807_LIBV413--V3\20150807_LIBV413\USER_PROGRAM\USER_PROGRAM.C
+				;1	#include    "USER_PROGRAM.H"  
+				;2	#include    "bittype.h"
+				;3	#define     TOUCH_IOPU   _pcpu4
+				;4	#define     TOUCH_IOC    _pcc4
+				;5	#define     TOUCH_IO     _pc4                            //TOUCH按键状态输出脚
+				;6	//==================================================
+				;7	#define     COM0         _pa1
+				;8	#define     COM1         _pa4
+				;9	#define     COM2         _pa0
+				;10	#define     COM3         _pa2
+				;11	#define     SEG0         _pb0
+				;12	#define     SEG1         _pb1
+				;13	#define     SEG2         _pb2
+				;14	#define     SEG3         _pb3
+				;15	#define     SEG4         _pb4
+				;16	#define     SEG5         _pb5
+				;17	volatile unsigned char  rx_databuf[5];
+				;18	volatile unsigned char  rx_data[5]; 
+				;19	volatile unsigned char  tx_databuf[5];
+				;20	volatile unsigned char  tx_data[5]; 
+				;21	volatile unsigned char  rx_cnt; 
+				;22	volatile unsigned char  rx_time_cnt; 
+				;23	volatile unsigned char  com_status;
+				;24	volatile unsigned char  dis_data[4];
+				;25	volatile unsigned char  data_buffer;
+				;26	
+				;27	volatile flag_type gv8u_flag1;
+				;28	#define  key_press_flag   gv8u_flag1.bits.bit0
+				;29	#define  rx_first_flag    gv8u_flag1.bits.bit1
+				;30	//#define send_data_flag   gv8u_flag1.bits.bit2             
+				;31	//==============================================
+				;32	//**********************************************
+				;33	//==============================================
+				;34	//=====CTM0定时器中断===============
+				;35	DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
+				;36	{
+				@Interrupt_CTM0A_code .SECTION 'CODE'
+0014	40D1	mov     r114, a
+0015	0704	mov     a, BP
+0016	40D2	mov     r214, a
+0017	2D6A	jmp     _Interrupt_CTM0A
+				_Interrupt_CTM0A:
+				_Interrupt_CTM0A:
+056A	070A	mov     a, STATUS
+056B	40D3	mov     r314, a
+056C	0703	mov     a, MP1
+056D	40D4	mov     r414, a
+056E	0701	mov     a, MP0
+056F	40D5	mov     r514, a
+0570	0707	mov     a, TBLP
+0571	40D6	mov     r614, a
+0572	0709	mov     a, TBHP
+0573	40D7	mov     r714, a
+				;37		if(rx_time_cnt<4)
+0574	0F03	mov     a, 3H
+0575	4237	sub     a, rx_time_cnt[0]
+0576	380A	snz     C
+0577	2D7A	jmp     _L2
+				;38		{
+				;39			rx_time_cnt++;
+0578	54B7	inc     rx_time_cnt[0]
+0579	2D7B	jmp     _L3
+				;40		}
+				;41		else
+				;42		{
+				;43			rx_first_flag=1;            //若长时间未收到数据，则认为此帧数据传输结束
+				_L2:
+057A	70B0	set     gv8u_flag1[0].1
+				;44		}
+				;45		COM3=0;	
+				_L3:
+057B	3514	clr     PA2
+				;46		COM2=0;	
+057C	3414	clr     PA0
+				;47		COM1=0;	
+057D	3614	clr     PA4
+				;48		COM0=0;	
+057E	3494	clr     PA1
+				;49		SEG0=0;	
+057F	3420	clr     PB0
+				;50		SEG1=0;
+0580	34A0	clr     PB1
+				;51		SEG2=0;
+0581	3520	clr     PB2
+				;52		SEG3=0;
+0582	35A0	clr     PB3
+				;53		SEG4=0;
+0583	3620	clr     PB4
+				;54		SEG5=0;	
+0584	36A0	clr     PB5
+				;55		switch(com_status)	
+0585	4736	mov     a, com_status[0]
+0586	40DE	mov     _Interrupt_CTM0A_2, a
+0587	475E	mov     a, _Interrupt_CTM0A_2
+0588	0A00	sub     a, 0H
+0589	3D0A	sz      Z
+058A	2DAB	jmp     _L5
+058B	0A01	sub     a, 1H
+058C	3D0A	sz      Z
+058D	2DB5	jmp     _L6
+058E	475E	mov     a, _Interrupt_CTM0A_2
+058F	0A02	sub     a, 2H
+0590	3D0A	sz      Z
+0591	2DBF	jmp     _L7
+0592	475E	mov     a, _Interrupt_CTM0A_2
+0593	0A03	sub     a, 3H
+0594	390A	snz     Z
+0595	2DC8	jmp     _L4
+				;56		{
+				;57			case 0:
+				;58			{
+				;59				data_buffer=dis_data[com_status];	
+				_L5:
+05AB	0FB2	mov     a, B2H
+05AC	4336	add     a, com_status[0]
+05AD	0083	mov     MP1, a
+05AE	0F00	mov     a, 0H
+05AF	1F01	clr     MP0
+05B0	1381	adcm    a, MP0
+05B1	279D	call    L079D
+05B2	40B1	mov     data_buffer[0], a
+				;60				COM0=1;	
+05B3	3094	set     PA1
+				;61				break;		
+05B4	2DC8	jmp     _L4
+				;62			}
+				;63			case 1:
+				;64			{
+				;65				data_buffer=dis_data[com_status];
+				_L6:
+05B5	0FB2	mov     a, B2H
+05B6	4336	add     a, com_status[0]
+05B7	0083	mov     MP1, a
+05B8	0F00	mov     a, 0H
+05B9	1F01	clr     MP0
+05BA	1381	adcm    a, MP0
+05BB	279D	call    L079D
+05BC	40B1	mov     data_buffer[0], a
+				;66				COM1=1;	
+05BD	3214	set     PA4
+				;67				break;		
+05BE	2DC8	jmp     _L4
+				;68			}
+				;69			case 2:
+				;70			{
+				;71				data_buffer=dis_data[com_status];
+				_L7:
+05BF	0FB2	mov     a, B2H
+05C0	4336	add     a, com_status[0]
+05C1	0083	mov     MP1, a
+05C2	0F00	mov     a, 0H
+05C3	1F01	clr     MP0
+05C4	1381	adcm    a, MP0
+05C5	279D	call    L079D
+05C6	40B1	mov     data_buffer[0], a
+				;72				COM2=1;			
+05C7	3014	set     PA0
+				;73				break;		
+				;74			}
+				;75			case 3:
+				;76			{
+				;77				data_buffer=dis_data[com_status];
+0596	0FB2	mov     a, B2H
+0597	4336	add     a, com_status[0]
+0598	0083	mov     MP1, a
+0599	0F00	mov     a, 0H
+059A	1F01	clr     MP0
+059B	1381	adcm    a, MP0
+059C	279D	call    L079D
+059D	40B1	mov     data_buffer[0], a
+				;78				COM3=1;
+059E	3114	set     PA2
+				;79				_frame=~_frame;
+059F	1833	rla     SLCDC0
+05A0	0E01	and     a, 1H
+05A1	40D8	mov     ra14, a
+05A2	0F01	mov     a, 1H
+05A3	44D8	xorm    a, ra14
+05A4	5BD8	rrc     ra14
+05A5	5F58	clr     ra14
+05A6	5BD8	rrc     ra14
+05A7	37B3	clr     FRAME
+05A8	4758	mov     a, ra14
+05A9	05B3	orm     a, SLCDC0
+				;80				break;		
+05AA	2DC8	jmp     _L4
+				;81			}
+				;82		}
+				;83		if(data_buffer&0x01)
+				_L4:
+05C8	7831	snz     data_buffer[0].0
+05C9	2DCB	jmp     _L9
+				;84		{
+				;85			SEG0=1;
+05CA	3020	set     PB0
+				;86		}
+				;87		if(data_buffer&0x02)
+				_L9:
+05CB	78B1	snz     data_buffer[0].1
+05CC	2DCE	jmp     _L10
+				;88		{
+				;89			SEG1=1;
+05CD	30A0	set     PB1
+				;90		}
+				;91		if(data_buffer&0x04)
+				_L10:
+05CE	7931	snz     data_buffer[0].2
+05CF	2DD1	jmp     _L11
+				;92		{
+				;93			SEG2=1;
+05D0	3120	set     PB2
+				;94		}
+				;95		if(data_buffer&0x08)
+				_L11:
+05D1	79B1	snz     data_buffer[0].3
+05D2	2DD4	jmp     _L12
+				;96		{
+				;97			SEG3=1;
+05D3	31A0	set     PB3
+				;98		}
+				;99		if(data_buffer&0x10)
+				_L12:
+05D4	7A31	snz     data_buffer[0].4
+05D5	2DD7	jmp     _L13
+				;100		{
+				;101			SEG4=1;
+05D6	3220	set     PB4
+				;102		}
+				;103		if(data_buffer&0x20)
+				_L13:
+05D7	7AB1	snz     data_buffer[0].5
+05D8	2DDA	jmp     _L14
+				;104		{
+				;105			SEG5=1;
+05D9	32A0	set     PB5
+				;106		}
+				;107		com_status++;
+				_L14:
+05DA	54B6	inc     com_status[0]
+				;108		if(com_status>3)
+05DB	0F03	mov     a, 3H
+05DC	4236	sub     a, com_status[0]
+05DD	3C0A	sz      C
+05DE	2DE0	jmp     _L1
+				;109		{
+				;110			com_status=0;
+05DF	5F36	clr     com_status[0]
+				_L1:
+05E0	4752	mov     a, r214
+05E1	0084	mov     BP, a
+05E2	4753	mov     a, r314
+05E3	008A	mov     STATUS, a
+05E4	4754	mov     a, r414
+05E5	0083	mov     MP1, a
+05E6	4755	mov     a, r514
+05E7	0081	mov     MP0, a
+05E8	4756	mov     a, r614
+05E9	0087	mov     TBLP, a
+05EA	4757	mov     a, r714
+05EB	0089	mov     TBHP, a
+05EC	1D05	tabrd   ACC
+05ED	4751	mov     a, r114
+05EE	0004	reti
+				;111		}
+				;112		
+				;113	}
+				;114	//=======UART接收中断===============
+				;115	DEFINE_ISR (Interrupt_Uart, 0x2c)
+				;116	{
+				@Interrupt_Uart_code .SECTION 'CODE'
+002C	40D9	mov     r12c, a
+002D	0704	mov     a, BP
+002E	40DA	mov     r22c, a
+002F	2DEF	jmp     _Interrupt_Uart
+				_Interrupt_Uart:
+				_Interrupt_Uart:
+05EF	070A	mov     a, STATUS
+05F0	40DB	mov     r32c, a
+05F1	0703	mov     a, MP1
+05F2	40DC	mov     r42c, a
+05F3	0701	mov     a, MP0
+05F4	40DD	mov     r52c, a
+				;117		if(_rxif&&!_oerr&&!_ferr&&!_nf)
+05F5	3928	snz     RXIF
+05F6	2E16	jmp     _L37
+05F7	3E28	sz      OERR
+05F8	2E16	jmp     _L37
+05F9	3EA8	sz      FERR
+05FA	2E16	jmp     _L37
+05FB	3F28	sz      NF
+05FC	2E16	jmp     _L37
+				;118		{	
+				;119			if(rx_first_flag)
+05FD	78B0	snz     gv8u_flag1[0].1
+05FE	2E02	jmp     _L39
+				;120			{
+				;121				rx_cnt=0;
+05FF	5F38	clr     rx_cnt[0]
+				;122				rx_first_flag=0;
+0600	74B0	clr     gv8u_flag1[0].1
+				;123				rx_time_cnt=0;
+0601	5F37	clr     rx_time_cnt[0]
+				;124			}
+				;125			if(rx_cnt<5)
+				_L39:
+0602	0F04	mov     a, 4H
+0603	4238	sub     a, rx_cnt[0]
+0604	380A	snz     C
+0605	2E16	jmp     _L37
+				;126			{	
+				;127				rx_databuf[rx_cnt]=_txr_rxr;
+0606	0FC8	mov     a, C8H
+0607	4338	add     a, rx_cnt[0]
+0608	0083	mov     MP1, a
+0609	0F00	mov     a, 0H
+060A	1F01	clr     MP0
+060B	1381	adcm    a, MP0
+060C	0701	mov     a, MP0
+060D	0084	mov     BP, a
+060E	072C	mov     a, TXR_RXR
+060F	0082	mov     [02H], a
+				;128				rx_cnt++;
+0610	54B8	inc     rx_cnt[0]
+				;129				if(rx_cnt==5)
+0611	4738	mov     a, rx_cnt[0]
+0612	0A05	sub     a, 5H
+0613	390A	snz     Z
+0614	2E16	jmp     _L37
+				;130				{
+				;131					rx_cnt=0;
+0615	5F38	clr     rx_cnt[0]
+				;132				}
+				;133			}
+				;134		}
+				;135		_acc=_usr;
+				_L37:
+0616	0728	mov     a, USR
+0617	0085	mov     ACC, a
+0618	475A	mov     a, r22c
+0619	0084	mov     BP, a
+061A	475B	mov     a, r32c
+061B	008A	mov     STATUS, a
+061C	475C	mov     a, r42c
+061D	0083	mov     MP1, a
+061E	475D	mov     a, r52c
+061F	0081	mov     MP0, a
+0620	4759	mov     a, r12c
+0621	0004	reti
+				;136	}
+				;137	//==============================================
+				;138	//**********************************************
+				;139	//==============================================
+				;140	void USER_PROGRAM_INITIAL()
+				;141	{	
+				;142		_papu=0;
+				_USER_PROGRAM_INITIAL:
+				_USER_PROGRAM_INITIAL:
+0622	1F16	clr     PAPU
+				;143		_pa=0;
+0623	1F14	clr     PA
+				;144		_pac=0b11101000;
+0624	0FE8	mov     a, E8H
+0625	0095	mov     PAC, a
+				;145		
+				;146		_pbpu=0;
+0626	1F22	clr     PBPU
+				;147		_pb=0;
+0627	1F20	clr     PB
+				;148		_pbc=0xff;	
+0628	1FA1	set     PBC
+				;149		
+				;150		_pcpu=0;
+0629	1F3B	clr     PCPU
+				;151		_pc=0;
+062A	1F39	clr     PC
+				;152		_pcc=0xff;	
+062B	1FBA	set     PCC
+				;153		
+				;154		_pdpu=0;
+062C	1F43	clr     PDPU
+				;155		_pd=0;
+062D	1F41	clr     PD
+				;156		_pdc=0xc0;	
+062E	0FC0	mov     a, C0H
+062F	00C2	mov     PDC, a
+				;157	  	
+				;158		//=====CTM0初始化============
+				;159		_ctm0c0=0x20;   //fsys/16
+0630	0F20	mov     a, 20H
+0631	00E1	mov     CTM0C0, a
+				;160		_ctm0c1=0xc1;
+0632	0FC1	mov     a, C1H
+0633	00E2	mov     CTM0C1, a
+				;161		_ctm0al=0xe8;
+0634	0FE8	mov     a, E8H
+0635	00E5	mov     CTM0AL, a
+				;162		_ctm0ah=0x03;   //1000*2us=2ms
+0636	0F03	mov     a, 3H
+0637	00E6	mov     CTM0AH, a
+				;163		_ct0on=1;
+0638	31E1	set     CT0ON
+				;164		_ctma0f=0;
+0639	368F	clr     CTMA0F
+				;165		_ctma0e=1;
+063A	308F	set     CTMA0E
+				;166		
+				;167		//=====UART初始化============
+				;168		_brg=12;                              //9600波特率
+063B	0F0C	mov     a, CH
+063C	00AB	mov     BRG, a
+				;169		_ucr1=0b10000000;
+063D	0F80	mov     a, 80H
+063E	00A9	mov     UCR1, a
+				;170		_ucr2=0b11000100;	   
+063F	0FC4	mov     a, C4H
+0640	00AA	mov     UCR2, a
+				;171		_uartf=0;
+0641	3790	clr     UARTF
+				;172		_uarte=1;	
+0642	3190	set     UARTE
+				;173		
+				;174		//=======SCOM_SSEG初始化=====
+				;175		_slcdc0=0b01111111;                   //工作电流100uA,SCOM0~SCOM3使能
+0643	0F7F	mov     a, 7FH
+0644	00B3	mov     SLCDC0, a
+				;176		_slcdc1=0b00111111;                   //SSEG0~SSEG5使能
+0645	0F3F	mov     a, 3FH
+0646	00B4	mov     SLCDC1, a
+				;177		_slcdc2=0b00000000;
+0647	1F35	clr     SLCDC2
+				;178		_slcdc3=0b00000000;
+0648	1F36	clr     SLCDC3
+				;179		dis_data[0]=0x00;
+0649	5F32	clr     dis_data[0]
+				;180			dis_data[1]=0x00;
+064A	5F33	clr     dis_data[1]
+				;181				dis_data[2]=0x00;
+064B	5F34	clr     dis_data[2]
+				;182					dis_data[3]=0x00;
+064C	5F35	clr     dis_data[3]
+064D	0003	ret
+				;183	}
+				;184	//==============================================
+				;185	//**********************************************
+				;186	//==============================================
+				;187	void UATR_SEND_DATA()                    //UART数据发送
+				;188	{
+				;189		unsigned char i;
+				;190	//	if(send_data_flag)
+				;191	//	{
+				;192	//		send_data_flag=0;
+				;193			for(i=0;i<5;i++)
+				_UATR_SEND_DATA:
+				_UATR_SEND_DATA:
+064E	5F4E	clr     ra
+065F	54CE	inc     ra
+0660	474E	mov     a, ra
+0661	0A05	sub     a, 5H
+0662	390A	snz     Z
+0663	2E4F	jmp     _L45
+0664	0003	ret
+				;194			{
+				;195				while(!_txif)
+				_L45:
+064F	3C28	sz      TXIF
+0650	2E55	jmp     _L48
+				;196				{
+				;197					GCC_CLRWDT();
+0651	0001	clr     wdt
+				;198					GCC_CLRWDT1();
+0652	0001	clr     wdt
+				;199					GCC_CLRWDT2();
+0653	0005	clr     wdt2
+0654	2E4F	jmp     _L45
+				;200				}		
+				;201				_acc=_usr;
+				_L48:
+0655	0728	mov     a, USR
+0656	0085	mov     ACC, a
+				;202				_txr_rxr=tx_databuf[i];		
+0657	0FBE	mov     a, BEH
+0658	434E	add     a, ra
+0659	0083	mov     MP1, a
+065A	0F00	mov     a, 0H
+065B	1F01	clr     MP0
+065C	1381	adcm    a, MP0
+065D	279D	call    L079D
+065E	00AC	mov     TXR_RXR, a
+				;203			}
+				;204	/*	}*/
+				;205	}
+				;206	//==============================================
+				;207	//**********************************************
+				;208	//==============================================
+				;209	void USER_PROGRAM()
+				;210	{
+				;211		if(SCAN_CYCLEF)
+				_USER_PROGRAM:
+				_USER_PROGRAM:
+				@dummy20 .SECTION 'CODE'
+0018	792D	snz     __ctm0ah[71].2
+0019	2829	jmp     _L49
+				;212		{
+				;213	   		GET_KEY_BITMAP();
+001A	254A	call    L054A
+				;214	   		if(key_press_flag==0)
+001B	7C30	sz      gv8u_flag1[0].0
+001C	2824	jmp     _L52
+				;215	   		{
+				;216				if(DATA_BUF[0]&&0x80)	
+001D	5093	sz      __ctm0ah[45]
+001E	2820	jmp     _LI1
+001F	2829	jmp     _L49
+				;217				{
+				;218					key_press_flag=1;
+				_LI1:
+0020	7030	set     gv8u_flag1[0].0
+				;219					TOUCH_IO=0; 
+0021	3639	clr     PC4
+				;220					TOUCH_IOC=0;                   //有按键，输出0  
+0022	363A	clr     PCC4
+0023	2829	jmp     _L49
+				;221				}	
+				;222	   		}
+				;223			else 
+				;224			{
+				;225				if(DATA_BUF[0]==0)	
+				_L52:
+0024	5093	sz      __ctm0ah[45]
+0025	2829	jmp     _L49
+				;226				{
+				;227					key_press_flag=0; 
+0026	7430	clr     gv8u_flag1[0].0
+				;228					TOUCH_IOPU=1;
+0027	323B	set     PCPU4
+				;229					TOUCH_IOC=1;                   //无按键，输入上拉
+0028	323A	set     PCC4
+				_L49:
+0029	0003	ret
+002A	0000	nop
+002B	0000	nop
+				;230				}
+				;231			}
+				;232	    }
+				;233	}
+				;file C:\Users\JunZh\Desktop\Projects\2017_ 空气盒\开发环境和硬件验证代码\BS82C16A_示例程序\BS82C16A_20150807_LIBV413--V3\20150807_LIBV413\USER_PROGRAM\iic_master.c
+				;1	#include "BS82C16A-3.H"
+				;2	//===================================================================//
+				;3	#define IO_DIR_SDA 	_pcc6
+				;4	#define IO_DAT_SDA	_pc6
+				;5	#define IO_DIR_SCL	_pcc7
+				;6	#define IO_DAT_SCL	_pc7
+				;7	
+				;8	#define IIC_ADDR_MASTERWR	0x54     
+				;9	#define IIC_ADDR_MASTERRD	0x55
+				;10	//===================================================================//
+				;11	 volatile unsigned char ac_ad_cnt ;
+				;12	static volatile unsigned char gv8u_iicmaster_txdata[10] __attribute__ ((at(0x1b0)));
+				;13	static volatile unsigned char gv8u_iicmaster_rxdata[10] __attribute__ ((at(0x1c0)));
+				;14	//===================================================================//
+				;15	void IIC_DELAY(void)
+				;16	{
+				;17		volatile unsigned char i;
+				;18		for(i=0;i<7;i++)
+				_IIC_DELAY:
+				_IIC_DELAY:
+0665	5F5F	clr     i[0]
+0666	2E69	jmp     _L2
+0668	54DF	inc     i[0]
+				_L2:
+0669	0F06	mov     a, 6H
+066A	425F	sub     a, i[0]
+066B	3C0A	sz      C
+066C	2E67	jmp     _L3
+066D	0003	ret
+				;19		{
+				;20			GCC_CLRWDT();
+				_L3:
+0667	0001	clr     wdt
+				;21		}
+				;22	}
+				;23	//===================================================================//
+				;24	
+				;25	void fun_iicmaster_start(void)
+				;26	{
+				;27		
+				;28		IO_DIR_SCL = 1;
+				_fun_iicmaster_start:
+				_fun_iicmaster_start:
+066E	33BA	set     PCC7
+				;29		if(IO_DAT_SCL == 0)
+066F	3FB9	sz      PC7
+0670	2E74	jmp     _L6
+				;30		{
+				;31			
+				;32			GCC_NOP();
+0671	0000	nop
+				;33			GCC_NOP();
+0672	0000	nop
+0673	2E7D	jmp     _L5
+				;34		}
+				;35		else
+				;36		{
+				;37			GCC_NOP();
+				_L6:
+0674	0000	nop
+				;38			if(IO_DAT_SCL == 1)
+0675	3BB9	snz     PC7
+0676	2E7D	jmp     _L5
+				;39			{
+				;40				IO_DIR_SDA = 1;
+0677	333A	set     PCC6
+				;41				IIC_DELAY();
+0678	2665	call    _IIC_DELAY
+				;42				IO_DIR_SCL = 1;
+0679	33BA	set     PCC7
+				;43				IO_DAT_SDA = 0;
+067A	3739	clr     PC6
+				;44				IO_DIR_SDA = 0;
+067B	373A	clr     PCC6
+				;45				IIC_DELAY();
+067C	2665	call    _IIC_DELAY
+				_L5:
+067D	0003	ret
+				;46			}
+				;47		}
+				;48	}
+				;49	//===================================================================//
+				;50	void fun_iicmaster_stop(void)
+				;51	{
+				;52		IO_DAT_SCL = 0;
+				_fun_iicmaster_stop:
+				_fun_iicmaster_stop:
+067E	37B9	clr     PC7
+				;53		IO_DIR_SCL = 0;	
+067F	37BA	clr     PCC7
+				;54		
+				;55		IO_DAT_SDA = 0;
+0680	3739	clr     PC6
+				;56		IO_DIR_SDA = 0;	
+0681	373A	clr     PCC6
+				;57		
+				;58		IIC_DELAY();
+0682	2665	call    _IIC_DELAY
+				;59		
+				;60		IO_DIR_SCL = 1;
+0683	33BA	set     PCC7
+				;61		
+				;62		IIC_DELAY();
+0684	2665	call    _IIC_DELAY
+				;63		IO_DIR_SDA = 1;	
+0685	333A	set     PCC6
+0686	0003	ret
+				;64		
+				;65	}
+				;66	//===================================================================//
+				;67	unsigned char fun_iicmaster_bytewrite(unsigned char lv8u_data)
+				;68	{
+				_fun_iicmaster_bytewrite:
+				_fun_iicmaster_bytewrite:
+0687	40E4	mov     lv8u_data[0], a
+				;69		volatile unsigned char i,j,k,lv8u_writeok;
+				;70		lv8u_writeok = 1;
+0688	0F01	mov     a, 1H
+0689	40E0	mov     lv8u_writeok[0], a
+				;71	
+				;72		k=0;
+068A	5F61	clr     k[0]
+				;73		for(i=0;i<8;i++)
+068B	5F63	clr     i[0]
+				L068C:
+068C	0F07	mov     a, 7H
+068D	4263	sub     a, i[0]
+068E	380A	snz     C
+068F	2EB4	jmp     L06B4
+06B2	54E3	inc     i[0]
+06B3	2E8C	jmp     L068C
+				;74		{
+				;75			IO_DAT_SCL = 0;
+0690	37B9	clr     PC7
+				;76			IO_DIR_SCL = 0;	
+0691	37BA	clr     PCC7
+				;77			if(lv8u_data&0x80)
+0692	7BE4	snz     lv8u_data[0].7
+0693	2E96	jmp     L0696
+				;78			{
+				;79				IO_DIR_SDA = 1;
+0694	333A	set     PCC6
+0695	2E98	jmp     L0698
+				;80			}
+				;81			else
+				;82			{
+				;83				IO_DAT_SDA = 0;
+				L0696:
+0696	3739	clr     PC6
+				;84				IO_DIR_SDA = 0;		
+0697	373A	clr     PCC6
+				;85			}
+				;86			IIC_DELAY();
+				L0698:
+0698	2665	call    _IIC_DELAY
+				;87			IO_DIR_SCL = 1;	
+0699	33BA	set     PCC7
+				;88			
+				;89			if(i == 0)				//iic bus idle check
+069A	50E3	sz      i[0]
+069B	2EAC	jmp     L06AC
+				;90			{
+				;91				while(1)
+				;92				{
+				;93					if(IO_DAT_SCL == 0)
+				L069C:
+069C	3FB9	sz      PC7
+069D	2EAC	jmp     L06AC
+				;94					{
+				;95						GCC_NOP();
+069E	0000	nop
+				;96						for(j=0;j<100;j++);
+069F	5F62	clr     j[0]
+				L06A0:
+06A0	0F63	mov     a, 63H
+06A1	4262	sub     a, j[0]
+06A2	380A	snz     C
+06A3	2EA6	jmp     L06A6
+06A4	54E2	inc     j[0]
+06A5	2EA0	jmp     L06A0
+				;97						k++;
+				L06A6:
+06A6	54E1	inc     k[0]
+				;98						if(k>20)
+06A7	0F14	mov     a, 14H
+06A8	4261	sub     a, k[0]
+06A9	3C0A	sz      C
+06AA	2E9C	jmp     L069C
+				;99						{
+				;100							lv8u_writeok = 0;
+06AB	5F60	clr     lv8u_writeok[0]
+				;101							break;
+				;102						}
+				;103						
+				;104					}
+				;105					else
+				;106					{
+				;107						break;
+				;108					}
+				;109				}
+				;110			}
+				;111			if(lv8u_writeok == 0)
+				L06AC:
+06AC	50E0	sz      lv8u_writeok[0]
+06AD	2EAF	jmp     L06AF
+06AE	2EB4	jmp     L06B4
+				;112			{
+				;113				break;
+				;114			}
+				;115			
+				;116			IIC_DELAY();
+				L06AF:
+06AF	2665	call    _IIC_DELAY
+				;117			lv8u_data = lv8u_data<<1;
+06B0	4764	mov     a, lv8u_data[0]
+06B1	43E4	addm    a, lv8u_data[0]
+				;118		}
+				;119		
+				;120		return lv8u_writeok;
+				L06B4:
+06B4	4760	mov     a, lv8u_writeok[0]
+06B5	40CE	mov     ra, a
+				;121	}
+06B6	474E	mov     a, ra
+06B7	0003	ret
+				;122	//===================================================================//
+				;123	unsigned char fun_iicmaster_rxak(void)
+				;124	{
+				;125		unsigned char i,j;
+				;126		j = 0;	
+06C1	5F4E	clr     ra
+				;127		IO_DAT_SCL = 0;
+				_fun_iicmaster_rxak:
+				_fun_iicmaster_rxak:
+06B8	37B9	clr     PC7
+				;128		IO_DIR_SCL = 0;	
+06B9	37BA	clr     PCC7
+				;129		
+				;130		IO_DIR_SDA = 1;
+06BA	333A	set     PCC6
+				;131		IIC_DELAY();
+06BB	2665	call    _IIC_DELAY
+				;132		IO_DIR_SCL = 1;	
+06BC	33BA	set     PCC7
+				;133		GCC_NOP();
+06BD	0000	nop
+				;134		GCC_NOP();
+06BE	0000	nop
+06BF	0F04	mov     a, 4H
+06C0	40CF	mov     rb, a
+				;135		for(i=0;i<4;i++)
+				;136		{
+				;137			if(IO_DAT_SDA == 0)
+				_L32:
+06C2	3F39	sz      PC6
+06C3	2EC5	jmp     _L30
+				;138			{
+				;139				j++;
+06C4	54CE	inc     ra
+				_L30:
+06C5	57CF	sdz     rb
+06C6	2EC2	jmp     _L32
+				;140			}
+				;141		}
+				;142		
+				;143		IO_DAT_SCL = 0;
+06C7	37B9	clr     PC7
+				;144		IO_DIR_SCL = 0;
+06C8	37BA	clr     PCC7
+				;145		
+				;146		if(j>2)
+06C9	0F01	mov     a, 1H
+06CA	40CF	mov     rb, a
+06CB	0F02	mov     a, 2H
+06CC	424E	sub     a, ra
+06CD	380A	snz     C
+06CE	2ED0	jmp     _L33
+06CF	5F4F	clr     rb
+				;147		{
+				;148			return 1;
+				;149		}
+				;150		else
+				;151		{
+				;152			return 0;
+				;153		}
+				;154	}
+				_L33:
+06D0	474F	mov     a, rb
+06D1	0003	ret
+				;155	//===================================================================//
+				;156	unsigned char fun_iicmaster_byteread(void)
+				;157	{
+				_fun_iicmaster_byteread:
+				_fun_iicmaster_byteread:
+06D2	0F08	mov     a, 8H
+06D3	40E1	mov     k, a
+				;158		unsigned char i,lv8u_data;
+				;159		lv8u_data = 0;
+06D4	5F60	clr     lv8u_data[0]
+				;160		for(i=0;i<8;i++)
+				;161		{	
+				;162			lv8u_data = lv8u_data<<1;
+				_L37:
+06D5	4760	mov     a, lv8u_data[0]
+06D6	43E0	addm    a, lv8u_data[0]
+				;163			
+				;164			IO_DAT_SCL = 0;
+06D7	37B9	clr     PC7
+				;165			IO_DIR_SCL = 0;
+06D8	37BA	clr     PCC7
+				;166			IO_DIR_SDA = 1;			
+06D9	333A	set     PCC6
+				;167			IIC_DELAY();
+06DA	2665	call    _IIC_DELAY
+				;168			IO_DIR_SCL = 1;	
+06DB	33BA	set     PCC7
+				;169			IIC_DELAY();
+06DC	2665	call    _IIC_DELAY
+				;170			if(IO_DAT_SDA == 1)
+06DD	3B39	snz     PC6
+06DE	2EE0	jmp     _L35
+				;171			{
+				;172				lv8u_data = lv8u_data|0x01;
+06DF	7060	set     lv8u_data[0].0
+				_L35:
+06E0	57E1	sdz     k
+06E1	2ED5	jmp     _L37
+				;173			}			
+				;174		}
+				;175		return lv8u_data;
+				;176	}
+06E2	4760	mov     a, lv8u_data[0]
+06E3	0003	ret
+				;177	//===================================================================//
+				;178	void fun_iicmaster_txak(void)
+				;179	{
+				;180		IO_DAT_SCL = 0;
+				_fun_iicmaster_txak:
+				_fun_iicmaster_txak:
+06E4	37B9	clr     PC7
+				;181		IO_DIR_SCL = 0;		
+06E5	37BA	clr     PCC7
+				;182		IIC_DELAY();
+06E6	2665	call    _IIC_DELAY
+				;183		IO_DAT_SDA = 0;
+06E7	3739	clr     PC6
+				;184		IO_DIR_SDA = 0;
+06E8	373A	clr     PCC6
+				;185		
+				;186		IO_DIR_SCL = 1;	
+06E9	33BA	set     PCC7
+				;187		IIC_DELAY();
+06EA	2665	call    _IIC_DELAY
+				;188		IO_DAT_SCL = 0;
+06EB	37B9	clr     PC7
+				;189		IO_DIR_SCL = 0;		
+06EC	37BA	clr     PCC7
+06ED	0003	ret
+				;190	}
+				;191	//===================================================================//
+				;192	void fun_iicmaster_txnoak(void)
+				;193	{
+				;194		IO_DAT_SCL = 0;
+				_fun_iicmaster_txnoak:
+				_fun_iicmaster_txnoak:
+06EE	37B9	clr     PC7
+				;195		IO_DIR_SCL = 0;		
+06EF	37BA	clr     PCC7
+				;196		IIC_DELAY();
+06F0	2665	call    _IIC_DELAY
+				;197		IO_DIR_SDA = 1;
+06F1	333A	set     PCC6
+				;198		
+				;199		IO_DIR_SCL = 1;	
+06F2	33BA	set     PCC7
+				;200		IIC_DELAY();
+06F3	2665	call    _IIC_DELAY
+				;201		IO_DAT_SCL = 0;
+06F4	37B9	clr     PC7
+				;202		IO_DIR_SCL = 0;		
+06F5	37BA	clr     PCC7
+06F6	0003	ret
+				;203	}
+				;204	//===================================================================//
+				;205	void fun_iicmaster_sendbytes(unsigned char lv8u_senlen)
+				;206	{
+				_fun_iicmaster_sendbytes:
+				_fun_iicmaster_sendbytes:
+06F7	40E5	mov     lv8u_senlen[0], a
+				;207		unsigned char i;
+				;208	//	pbuf = gv8u_iicmaster_txdata;
+				;209			gv8u_iicmaster_txdata[0] =0xb0;//gv8u_iicmaster_rxdata[0];
+06F8	0FB0	mov     a, B0H
+06F9	0083	mov     MP1, a
+06FA	0F01	mov     a, 1H
+06FB	0081	mov     MP0, a
+06FC	0701	mov     a, MP0
+06FD	0084	mov     BP, a
+06FE	0FB0	mov     a, B0H
+06FF	0082	mov     [02H], a
+				;210			gv8u_iicmaster_txdata[1] =55;//gv8u_iicmaster_rxdata[1];
+0700	1483	inc     MP1
+0701	3D0A	sz      Z
+0702	1481	inc     MP0
+0703	0701	mov     a, MP0
+0704	0084	mov     BP, a
+0705	0F37	mov     a, 37H
+0706	0082	mov     [02H], a
+				;211			gv8u_iicmaster_txdata[2] = 55;//gv8u_iicmaster_rxdata[2];
+0707	1483	inc     MP1
+0708	3D0A	sz      Z
+0709	1481	inc     MP0
+070A	0701	mov     a, MP0
+070B	0084	mov     BP, a
+070C	0F37	mov     a, 37H
+070D	0082	mov     [02H], a
+				;212			gv8u_iicmaster_txdata[3] = 55;//gv8u_iicmaster_rxdata[3];
+070E	1483	inc     MP1
+070F	3D0A	sz      Z
+0710	1481	inc     MP0
+0711	0701	mov     a, MP0
+0712	0084	mov     BP, a
+0713	0F37	mov     a, 37H
+0714	0082	mov     [02H], a
+				;213			gv8u_iicmaster_txdata[4] =55;//gv8u_iicmaster_rxdata[4];
+0715	1483	inc     MP1
+0716	3D0A	sz      Z
+0717	1481	inc     MP0
+0718	0701	mov     a, MP0
+0719	0084	mov     BP, a
+071A	0F37	mov     a, 37H
+071B	0082	mov     [02H], a
+				;214			gv8u_iicmaster_txdata[5] = 55;//gv8u_iicmaster_rxdata[5];
+071C	1483	inc     MP1
+071D	3D0A	sz      Z
+071E	1481	inc     MP0
+071F	0701	mov     a, MP0
+0720	0084	mov     BP, a
+0721	0F37	mov     a, 37H
+0722	0082	mov     [02H], a
+				;215			gv8u_iicmaster_txdata[6] = 55;//gv8u_iicmaster_rxdata[6];
+0723	1483	inc     MP1
+0724	3D0A	sz      Z
+0725	1481	inc     MP0
+0726	0701	mov     a, MP0
+0727	0084	mov     BP, a
+0728	0F37	mov     a, 37H
+0729	0082	mov     [02H], a
+				;216			gv8u_iicmaster_txdata[7] =55;//gv8u_iicmaster_rxdata[7];
+072A	1483	inc     MP1
+072B	3D0A	sz      Z
+072C	1481	inc     MP0
+072D	0701	mov     a, MP0
+072E	0084	mov     BP, a
+072F	0F37	mov     a, 37H
+0730	0082	mov     [02H], a
+				;217			gv8u_iicmaster_txdata[8] = 55;//gv8u_iicmaster_rxdata[8];
+0731	1483	inc     MP1
+0732	3D0A	sz      Z
+0733	1481	inc     MP0
+0734	0701	mov     a, MP0
+0735	0084	mov     BP, a
+0736	0F37	mov     a, 37H
+0737	0082	mov     [02H], a
+				;218			gv8u_iicmaster_txdata[9] = 55;//gv8u_iicmaster_rxdata[9];
+0738	1483	inc     MP1
+0739	3D0A	sz      Z
+073A	1481	inc     MP0
+073B	0701	mov     a, MP0
+073C	0084	mov     BP, a
+073D	0F37	mov     a, 37H
+073E	0082	mov     [02H], a
+				;219		fun_iicmaster_start();
+073F	266E	call    _fun_iicmaster_start
+				;220		fun_iicmaster_bytewrite(IIC_ADDR_MASTERWR);
+0740	0F54	mov     a, 54H
+0741	2687	call    _fun_iicmaster_bytewrite
+				;221		if(fun_iicmaster_rxak())
+0742	26B8	call    _fun_iicmaster_rxak
+0743	40CE	mov     ra, a
+0744	50CE	sz      ra
+0745	2F47	jmp     L0747
+0746	2F60	jmp     L0760
+				L0747:
+0747	5F66	clr     i[0]
+				;222		{
+				;223	
+				;224			for(i=0;i<lv8u_senlen;i++)
+				L0748:
+0748	4766	mov     a, i[0]
+0749	4265	sub     a, lv8u_senlen[0]
+074A	3C0A	sz      C
+074B	2F60	jmp     L0760
+075D	54E6	inc     i[0]
+075E	2F48	jmp     L0748
+				;225			{
+				;226				
+				;227				fun_iicmaster_bytewrite(gv8u_iicmaster_txdata[i]);
+074C	0FB0	mov     a, B0H
+074D	4366	add     a, i[0]
+074E	0083	mov     MP1, a
+074F	0F01	mov     a, 1H
+0750	1F01	clr     MP0
+0751	1381	adcm    a, MP0
+0752	279D	call    L079D
+0753	40CE	mov     ra, a
+0754	474E	mov     a, ra
+0755	2687	call    _fun_iicmaster_bytewrite
+				;228				if(fun_iicmaster_rxak())
+0756	26B8	call    _fun_iicmaster_rxak
+0757	40CE	mov     ra, a
+0758	50CE	sz      ra
+0759	2F5B	jmp     L075B
+075A	2F5F	jmp     L075F
+				;229				{
+				;230	//				pbuf++
+				;231					IIC_DELAY();
+				L075B:
+075B	2665	call    _IIC_DELAY
+				;232					GCC_CLRWDT();
+075C	0001	clr     wdt
+				;233				}
+				;234				else
+				;235				{
+				;236					GCC_CLRWDT();
+				L075F:
+075F	0001	clr     wdt
+				;237					break;
+				;238				}
+				;239			}
+				;240		}
+				;241	
+				;242		fun_iicmaster_stop();
+				L0760:
+0760	267E	call    _fun_iicmaster_stop
+0761	0003	ret
+				;243		
+				;244	}
+				;245	
+				;246	//=======================================================================//
+				;247	//===================================================================//
+				;248	void fun_iicmaster_recbytes(unsigned char lv8u_reclen)
+				;249	{
+				_fun_iicmaster_recbytes:
+				_fun_iicmaster_recbytes:
+0762	40E5	mov     lv8u_reclen[0], a
+				;250	//	unsigned char *pbuf;
+				;251		unsigned char i;
+				;252	//	pbuf = &gv8u_iicmaster_rxdata[0];
+				;253		fun_iicmaster_start();
+0763	266E	call    _fun_iicmaster_start
+				;254		fun_iicmaster_bytewrite(IIC_ADDR_MASTERRD);
+0764	0F55	mov     a, 55H
+0765	2687	call    _fun_iicmaster_bytewrite
+				;255		if(fun_iicmaster_rxak())
+0766	26B8	call    _fun_iicmaster_rxak
+0767	40CE	mov     ra, a
+0768	50CE	sz      ra
+0769	2F6B	jmp     L076B
+076A	2F9A	jmp     L079A
+				L076B:
+076B	5F66	clr     i[0]
+				;256		{
+				;257			for(i=0;i<lv8u_reclen-1;i++)
+				L076C:
+076C	4766	mov     a, i[0]
+076D	40E7	mov     i[1], a
+076E	5F68	clr     i[2]
+076F	0FFF	mov     a, FFH
+0770	4365	add     a, lv8u_reclen[0]
+0771	40CF	mov     rb, a
+0772	0FFF	mov     a, FFH
+0773	5F50	clr     rc
+0774	53D0	adcm    a, rc
+0775	4767	mov     a, i[1]
+0776	424F	sub     a, rb
+0777	4768	mov     a, i[2]
+0778	5250	sbc     a, rc
+0779	1185	swap    ACC
+077A	040A	xor     a, STATUS
+077B	3985	snz     ACC.3
+077C	2F8D	jmp     L078D
+078B	54E6	inc     i[0]
+078C	2F6C	jmp     L076C
+				;258			{
+				;259			//	*pbuf = fun_iicmaster_byteread();
+				;260			    gv8u_iicmaster_rxdata[i] = fun_iicmaster_byteread();
+077D	26D2	call    _fun_iicmaster_byteread
+077E	40CE	mov     ra, a
+077F	0FC0	mov     a, C0H
+0780	4367	add     a, i[1]
+0781	0083	mov     MP1, a
+0782	0F01	mov     a, 1H
+0783	5368	adc     a, i[2]
+0784	0081	mov     MP0, a
+0785	0701	mov     a, MP0
+0786	0084	mov     BP, a
+0787	474E	mov     a, ra
+0788	0082	mov     [02H], a
+				;261				fun_iicmaster_txak();	
+0789	26E4	call    _fun_iicmaster_txak
+				;262				IIC_DELAY();
+078A	2665	call    _IIC_DELAY
+				;263			//	pbuf++;					
+				;264			}
+				;265				gv8u_iicmaster_rxdata[i] = fun_iicmaster_byteread();
+				L078D:
+078D	26D2	call    _fun_iicmaster_byteread
+078E	40CE	mov     ra, a
+078F	0FC0	mov     a, C0H
+0790	4367	add     a, i[1]
+0791	0083	mov     MP1, a
+0792	0F01	mov     a, 1H
+0793	5368	adc     a, i[2]
+0794	0081	mov     MP0, a
+0795	0701	mov     a, MP0
+0796	0084	mov     BP, a
+0797	474E	mov     a, ra
+0798	0082	mov     [02H], a
+				;266				fun_iicmaster_txnoak();
+0799	26EE	call    _fun_iicmaster_txnoak
+				;267		}
+				;268		fun_iicmaster_stop();	
+				L079A:
+079A	267E	call    _fun_iicmaster_stop
+079B	0003	ret
+079C	1483	inc     MP1
+				L079D:
+079D	0701	mov     a, MP0
+079E	0084	mov     BP, a
+079F	0702	mov     a, [02H]
+07A0	0003	ret
+				;269	/*	return gv8u_iicmaster_rxdata;*/
+				;270	}
+				data .SECTION 'DATA'
+				__acc DB DUP (?) ; __acc
+				__intc1 DB DUP (?) ; __intc1
+				__intc2 DB DUP (?) ; __intc2
+				__pa DB DUP (?) ; __pa
+				__pac DB DUP (?) ; __pac
+				__papu DB DUP (?) ; __papu
+				__pb DB DUP (?) ; __pb
+				__pbc DB DUP (?) ; __pbc
+				__pbpu DB DUP (?) ; __pbpu
+				__usr DB DUP (?) ; __usr
+				__ucr1 DB DUP (?) ; __ucr1
+				__ucr2 DB DUP (?) ; __ucr2
+				__brg DB DUP (?) ; __brg
+				__txr_rxr DB DUP (?) ; __txr_rxr
+				__slcdc0 DB DUP (?) ; __slcdc0
+				__slcdc1 DB DUP (?) ; __slcdc1
+				__slcdc2 DB DUP (?) ; __slcdc2
+				__slcdc3 DB DUP (?) ; __slcdc3
+				__pc DB DUP (?) ; __pc
+				__pcc DB DUP (?) ; __pcc
+				__pcpu DB DUP (?) ; __pcpu
+				__pd DB DUP (?) ; __pd
+				__pdc DB DUP (?) ; __pdc
+				__pdpu DB DUP (?) ; __pdpu
+				__ctm0c0 DB DUP (?) ; __ctm0c0
+				__ctm0c1 DB DUP (?) ; __ctm0c1
+				__ctm0al DB DUP (?) ; __ctm0al
+				__ctm0ah DB DUP (?) ; __ctm0ah
+				POR_ID DB DUP (?) ; POR_ID
+				gv8u_flag1 DB DUP (?) ; gv8u_flag1
+				data_buffer DB DUP (?) ; data_buffer
+				dis_data DB DUP (?) ; dis_data
+				com_status DB DUP (?) ; com_status
+				rx_time_cnt DB DUP (?) ; rx_time_cnt
+				rx_cnt DB DUP (?) ; rx_cnt
+				tx_data DB DUP (?) ; tx_data
+				tx_databuf DB DUP (?) ; tx_databuf
+				rx_data DB DUP (?) ; rx_data
+				rx_databuf DB DUP (?) ; rx_databuf
+				ac_ad_cnt DB DUP (?) ; ac_ad_cnt
+				ra DB DUP (?)
+				rb DB DUP (?)
+				rc DB DUP (?)
+				r114 DB DUP (?)
+				r214 DB DUP (?)
+				r314 DB DUP (?)
+				r414 DB DUP (?)
+				r514 DB DUP (?)
+				r614 DB DUP (?)
+				r714 DB DUP (?)
+				ra14 DB DUP (?)
+				r12c DB DUP (?)
+				r22c DB DUP (?)
+				r32c DB DUP (?)
+				r42c DB DUP (?)
+				r52c DB DUP (?)
+				_Interrupt_CTM0A_2 DB DUP (?)
+				i DB DUP (?) ; i
+				lv8u_data DB DUP (?) ; lv8u_data
+				k DB DUP (?) ; k
+				j DB DUP (?) ; j
+				i DB DUP (?) ; i
+				lv8u_data DB DUP (?) ; lv8u_data
+				lv8u_reclen DB DUP (?) ; lv8u_reclen
+				i DB DUP (?) ; i
+				gv8u_iicmaster_txdata DB DUP (?) ; gv8u_iicmaster_txdata
+				gv8u_iicmaster_rxdata DB DUP (?) ; gv8u_iicmaster_rxdata
