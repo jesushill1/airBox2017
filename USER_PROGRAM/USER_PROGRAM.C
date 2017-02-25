@@ -15,6 +15,8 @@
 #define     SEG3         _pb3
 #define     SEG4         _pb4
 #define     SEG5         _pb5
+
+
 volatile unsigned char  rx_databuf[5];
 volatile unsigned char  rx_data[5]; 
 volatile unsigned char  tx_databuf[5];
@@ -22,20 +24,58 @@ volatile unsigned char  tx_data[5];
 volatile unsigned char  rx_cnt; 
 volatile unsigned char  rx_time_cnt; 
 volatile unsigned char  com_status;
-volatile unsigned char  dis_data[4];
-volatile unsigned char  data_buffer;
-unsigned int key1;
 volatile flag_type gv8u_flag1;
-#define  key_press_flag   gv8u_flag1.bits.bit0
+
+
+
+#define  KeyPressed   gv8u_flag1.bits.bit0
 #define  rx_first_flag    gv8u_flag1.bits.bit1
-//#define send_data_flag   gv8u_flag1.bits.bit2             
+#define  KeyLongPressed   gv8u_flag1.bits.bit2
+#define  KeyShortPressed   gv8u_flag1.bits.bit3
+#define  KeyLongPressHold   gv8u_flag1.bits.bit4
+
+#define  LONG_PRESS_TIME  3000
+#define  SHORT_PRESS_TIME 200
+
+static volatile unsigned int 	KeyPressTmr 	__attribute__((at(0x380)));
+static volatile unsigned char 	DataType 		__attribute__((at(0x382)));
+static volatile unsigned char 	LcdSegData[3] 	__attribute__((at(0x383)));
+static volatile unsigned int 	LcdData 		__attribute__((at(0x386)));
+static volatile unsigned int 	Temperature 	__attribute__((at(0x388)));
+static volatile unsigned int 	DustWeight 		__attribute__((at(0x38a)));
+static volatile unsigned int 	Humidity 		__attribute__((at(0x39c)));
+
+
+#define SegA 0x80	/* COM3 + SEG1 */
+#define SegB 0x40	/* COM2 + SEG1 */
+#define SegC 0x20	/* COM1 + SEG1 */
+#define SegD 0x10	/* COM0 + SEG1 */
+#define SegE 0x01	/* COM0 + SEG0 */
+#define SegF 0x04	/* COM2 + SEG0 */
+#define SegG 0x02	/* COM1 + SEG0 */
+#define SegS 0x08	/* COM3 + SEG0 */
+
+const unsigned char DigSegTable[11] =
+{
+	SegA + SegB + SegC + SegD + SegE + SegF,		// '0'
+	SegB + SegC,									// '1'
+	SegA + SegB + SegD + SegE + SegG,				// '2'
+	SegA + SegB + SegC + SegD + SegG,				// '3'
+	SegB + SegC + SegF + SegG,						// '4'
+	SegA + SegC + SegD + SegF + SegG,				// '5'
+	SegA + SegC + SegD + SegE + SegF + SegG,		// '6'
+	SegA + SegB + SegC,								// '7'
+	SegA + SegB + SegC + SegD + SegE + SegF + SegG,	// '8'
+	SegA + SegB + SegC + SegD + SegF + SegG,		// '9'
+	SegG											// '-'
+};
+void LcdRefresh(void);
 //==============================================
 //**********************************************
 //==============================================
 //=====CTM0定时器中断===============
 DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
 {
-	return;
 	if(rx_time_cnt<4)
 	{
 		rx_time_cnt++;
@@ -44,6 +84,7 @@ DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
 	{
 		rx_first_flag=1;            //若长时间未收到数据，则认为此帧数据传输结束
 	}
+
 	COM3=0;	
 	COM2=0;	
 	COM1=0;	
@@ -54,57 +95,35 @@ DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
 	SEG3=0;
 	SEG4=0;
 	SEG5=0;	
+	SEG0 = (LcdSegData[0] & (0b00001000 >>com_status))? 1 : 0;
+	SEG1 = (LcdSegData[0] & (0b10000000 >>com_status))? 1 : 0;
+	SEG2 = (LcdSegData[1] & (0b00001000 >>com_status))? 1 : 0;
+	SEG3 = (LcdSegData[1] & (0b10000000 >>com_status))? 1 : 0;
+	SEG4 = (LcdSegData[2] & (0b00001000 >>com_status))? 1 : 0;
+	SEG5 = (LcdSegData[2] & (0b10000000 >>com_status))? 1 : 0;
 	switch(com_status)	
 	{
 		case 0:
 		{
-			data_buffer=dis_data[com_status];	
 			COM0=1;	
 			break;		
 		}
 		case 1:
 		{
-			data_buffer=dis_data[com_status];
 			COM1=1;	
 			break;		
 		}
 		case 2:
 		{
-			data_buffer=dis_data[com_status];
 			COM2=1;			
 			break;		
 		}
 		case 3:
 		{
-			data_buffer=dis_data[com_status];
 			COM3=1;
 			_frame=~_frame;
 			break;		
 		}
-	}
-	if(data_buffer&0x01)
-	{
-		SEG0=1;
-	}
-	if(data_buffer&0x02)
-	{
-		SEG1=1;
-	}
-	if(data_buffer&0x04)
-	{
-		SEG2=1;
-	}
-	if(data_buffer&0x08)
-	{
-		SEG3=1;
-	}
-	if(data_buffer&0x10)
-	{
-		SEG4=1;
-	}
-	if(data_buffer&0x20)
-	{
-		SEG5=1;
 	}
 	com_status++;
 	if(com_status>3)
@@ -177,14 +196,20 @@ void USER_PROGRAM_INITIAL()
 	_uarte=1;	
 	
 	//=======SCOM_SSEG初始化=====
-	_slcdc0=0b01111111;                   //工作电流100uA,SCOM0~SCOM3使能
+	_slcdc0=0b00011111;                   //工作电流100uA,SCOM0~SCOM3使能
 	_slcdc1=0b00111111;                   //SSEG0~SSEG5使能
 	_slcdc2=0b00000000;
 	_slcdc3=0b00000000;
-    dis_data[0]=0x00;
-    dis_data[1]=0x00;
-    dis_data[2]=0x00;
-    dis_data[3]=0x00;
+    LcdSegData[0]=0x01;
+    LcdSegData[1]=0x00;
+    LcdSegData[2]=0x00;
+    
+    //
+    DataType = 0;
+    KeyPressTmr = 0;
+    Temperature = 0;
+    Humidity = 0;
+    DustWeight = 0;
 }
 //==============================================
 //**********************************************
@@ -216,21 +241,99 @@ void USER_PROGRAM()
 	if(SCAN_CYCLEF)
 	{
    		GET_KEY_BITMAP();
-   		if(key_press_flag==0)
+   		KeyPressed = DATA_BUF[1]&0b00000010 ? 1 : 0;
+   		if(!KeyPressed)
    		{
-			if(DATA_BUF[1]&0b00000010)	
-			{
-				key_press_flag=1;
-                LIGHT = 1;
-			}	
+   			if(KeyPressTmr>=LONG_PRESS_TIME)
+   			{
+   			}
+			else if(KeyPressTmr>=SHORT_PRESS_TIME)
+   			{
+   				KeyShortPressed = 1;
+   			}
+   			KeyPressTmr = 0;
+   			KeyLongPressHold = 0;
    		}
-		else 
-		{
-			if(DATA_BUF[1]==0)	
-			{
-				key_press_flag=0; 
-                LIGHT = 0;
-			}
-		}
+   		else
+   		{
+   			KeyPressTmr+=30;
+   			if(KeyPressTmr>LONG_PRESS_TIME && !KeyLongPressHold)
+   			{
+   				KeyPressTmr = LONG_PRESS_TIME;
+   				KeyLongPressHold = 1;
+   				KeyLongPressed = 1;
+   			}
+   		}
+   		// Long key press handler
+   		if(KeyLongPressed)
+   		{
+   			LIGHT = !LIGHT;
+   			KeyLongPressed = 0;
+   		}
+   		// Long key press handler
+   		if(KeyShortPressed)
+   		{
+   			DataType = (DataType + 1) % 3;
+
+   			KeyShortPressed = 0;
+   		}
+   		Temperature=99;
+   		Humidity=80;
+   		DustWeight=170;
+		LcdRefresh();
     }
+}
+
+void LcdRefresh(void)
+{
+	unsigned char hundred, ten, digit;
+	LcdSegData[0] = 0;
+	LcdSegData[1] = 0;
+	LcdSegData[2] = 0;
+	
+	switch(DataType)
+	{
+		case 1:			// Temperature
+			LcdSegData[2] = SegS;
+			LcdData = Temperature;		/* Temperautre is 2 digits */
+			break;
+		case 2:			// Humidity
+			LcdSegData[1] = SegS;
+			LcdData = Humidity;		/* Humidity is 2 digits */
+			break;
+		case 0: /* PM2.5 */
+			LcdSegData[0] = SegS;
+			LcdData = DustWeight;
+			break;
+		default:
+			LcdData = 0;
+	}
+	if (LcdData < 0)
+	{
+		// If data is invalid, display "---"
+		LcdSegData[0] += DigSegTable[10];
+		LcdSegData[1] += DigSegTable[10];
+		LcdSegData[2] += DigSegTable[10];
+	}
+	else
+	{
+		if (LcdData > 999)
+		{
+			hundred = 9;
+			ten = 9;
+			digit = 9;
+		}
+		else
+		{
+			hundred = LcdData / 100;
+			ten = (LcdData % 100) / 10;
+			digit = LcdData % 10;
+		}
+		if ((hundred != 0) || (DataType == 0))
+		{
+			LcdSegData[0] += DigSegTable[hundred];
+		}
+		LcdSegData[1] += DigSegTable[ten];
+		LcdSegData[2] += DigSegTable[digit];
+	}
 }
