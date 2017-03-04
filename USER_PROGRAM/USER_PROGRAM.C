@@ -70,9 +70,20 @@ const unsigned char DigSegTable[11] =
 	SegA + SegB + SegC + SegD + SegF + SegG,		// '9'
 	SegG											// '-'
 };
-static void LcdDataRefresh(void);
-static void LcdRefresh(void);
+void LcdDataRefresh(void);
+void LcdRefresh(void);
 #define Delay_us(us)  GCC_DELAY(us*2)
+
+
+inline void DHT11_PinPullLow()
+{
+    _pc3=0;
+    _pcc3=0;
+}
+inline void DHT11_PinRelease()
+{
+    _pcc3=1;
+}
 //==============================================
 //**********************************************
 //==============================================
@@ -165,9 +176,9 @@ void USER_PROGRAM_INITIAL()
     //
     DataType = 0;
     KeyPressTmr = 0;
-    Temperature = 0;
-    Humidity = 0;
-    DustWeight = 0;
+    Temperature = -99;
+    Humidity = 99;
+    DustWeight = 100;
 }
 //==============================================
 //**********************************************
@@ -238,19 +249,31 @@ void USER_PROGRAM()
    			KeyShortPressed = 0;
    			LcdDataRefresh();
    		}
+   		LcdRefresh();
     }
     
-    if(cnt>=20)
-    {
-    	cnt=0;
-    	TmpHumRead(&Temperature, &Humidity);
-    	
-    	LcdDataRefresh();
-    	
-    }
+	switch(cnt)
+	{
+	case 0:
+		DHT11_PinPullLow();
+		break;
+	case 1:
+		DHT11_PinRelease();
+		TmpHumRead(&Temperature, &Humidity);
+		break;
+	case 2:
+		LcdDataRefresh();
+		break;
+	default:
+		break;
+	}
+	if(cnt>=20)
+	{
+		cnt=0;
+	}
 }
 
-static void LcdDataRefresh(void)
+void LcdDataRefresh(void)
 {
 	unsigned char hundred, ten, digit;
 	LcdSegData[0] = 0;
@@ -318,7 +341,7 @@ static void LcdDataRefresh(void)
 
 	}
 }
-static void LcdRefresh(void)
+void LcdRefresh(void)
 {
 	// LCD refresh
 	COM3=0;	
