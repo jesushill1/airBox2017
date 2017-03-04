@@ -22,7 +22,7 @@ INCLUDE BS82C16A-3.INC
 ;-TOUCH KEY LIBRARY VARIES DEFINE
 ;--------------------------------
 ;-numeric operate ; range 0 ~ 15;                                            
-#define DebounceTimes           2       ; 30+10*n ms  
+#define DebounceTimes           0       ; 30+10*n ms  
 
 ;-numeric operate ; range 0 ~ 15; function: Time period to calibrate                   
 #define AutoCalibrationPeriod   7       ;auto calibration period select 0=80ms .....15=1280ms

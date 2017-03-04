@@ -1,5 +1,6 @@
 #include    "USER_PROGRAM.H"  
 #include    "bittype.h"
+#include    "p0TmpHumSensor.h"
 #define     TOUCH_IOPU   _pcpu4
 #define     TOUCH_IOC    _pcc4
 #define     TOUCH_IO     _pc4                            //TOUCH按键状态输出脚
@@ -40,8 +41,8 @@ volatile flag_type gv8u_flag1;
 static volatile unsigned int 	KeyPressTmr 	__attribute__((at(0x380)));
 static volatile unsigned char 	DataType 		__attribute__((at(0x382)));
 static volatile unsigned char 	LcdSegData[3] 	__attribute__((at(0x383)));
-static volatile unsigned int 	LcdData 		__attribute__((at(0x386)));
-static volatile unsigned int 	Temperature 	__attribute__((at(0x388)));
+static volatile int 			LcdData 		__attribute__((at(0x386)));
+static volatile int 			Temperature 	__attribute__((at(0x388)));
 static volatile unsigned int 	DustWeight 		__attribute__((at(0x38a)));
 static volatile unsigned int 	Humidity 		__attribute__((at(0x39c)));
 
@@ -69,7 +70,9 @@ const unsigned char DigSegTable[11] =
 	SegA + SegB + SegC + SegD + SegF + SegG,		// '9'
 	SegG											// '-'
 };
-void LcdRefresh(void);
+static void LcdDataRefresh(void);
+static void LcdRefresh(void);
+#define Delay_us(us)  GCC_DELAY(us*2)
 //==============================================
 //**********************************************
 //==============================================
@@ -84,53 +87,8 @@ DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
 	{
 		rx_first_flag=1;            //若长时间未收到数据，则认为此帧数据传输结束
 	}
+	//LcdRefresh();
 
-	COM3=0;	
-	COM2=0;	
-	COM1=0;	
-	COM0=0;	
-	SEG0=0;	
-	SEG1=0;
-	SEG2=0;
-	SEG3=0;
-	SEG4=0;
-	SEG5=0;	
-	SEG0 = (LcdSegData[0] & (0b00001000 >>com_status))? 1 : 0;
-	SEG1 = (LcdSegData[0] & (0b10000000 >>com_status))? 1 : 0;
-	SEG2 = (LcdSegData[1] & (0b00001000 >>com_status))? 1 : 0;
-	SEG3 = (LcdSegData[1] & (0b10000000 >>com_status))? 1 : 0;
-	SEG4 = (LcdSegData[2] & (0b00001000 >>com_status))? 1 : 0;
-	SEG5 = (LcdSegData[2] & (0b10000000 >>com_status))? 1 : 0;
-	switch(com_status)	
-	{
-		case 0:
-		{
-			COM0=1;	
-			break;		
-		}
-		case 1:
-		{
-			COM1=1;	
-			break;		
-		}
-		case 2:
-		{
-			COM2=1;			
-			break;		
-		}
-		case 3:
-		{
-			COM3=1;
-			_frame=~_frame;
-			break;		
-		}
-	}
-	com_status++;
-	if(com_status>3)
-	{
-		com_status=0;
-	}
-	
 }
 //=======UART接收中断===============
 DEFINE_ISR (Interrupt_Uart, 0x2c)
@@ -238,8 +196,11 @@ void UATR_SEND_DATA()                    //UART数据发送
 //==============================================
 void USER_PROGRAM()
 {
+	static unsigned char cnt=0;
+	static unsigned char st=0;
 	if(SCAN_CYCLEF)
 	{
+		cnt++;
    		GET_KEY_BITMAP();
    		KeyPressed = DATA_BUF[1]&0b00000010 ? 1 : 0;
    		if(!KeyPressed)
@@ -274,17 +235,22 @@ void USER_PROGRAM()
    		if(KeyShortPressed)
    		{
    			DataType = (DataType + 1) % 3;
-
    			KeyShortPressed = 0;
+   			LcdDataRefresh();
    		}
-   		Temperature=99;
-   		Humidity=80;
-   		DustWeight=170;
-		LcdRefresh();
+    }
+    
+    if(cnt>=20)
+    {
+    	cnt=0;
+    	TmpHumRead(&Temperature, &Humidity);
+    	
+    	LcdDataRefresh();
+    	
     }
 }
 
-void LcdRefresh(void)
+static void LcdDataRefresh(void)
 {
 	unsigned char hundred, ten, digit;
 	LcdSegData[0] = 0;
@@ -294,11 +260,11 @@ void LcdRefresh(void)
 	switch(DataType)
 	{
 		case 1:			// Temperature
-			LcdSegData[2] = SegS;
+			LcdSegData[1] = SegS;
 			LcdData = Temperature;		/* Temperautre is 2 digits */
 			break;
 		case 2:			// Humidity
-			LcdSegData[1] = SegS;
+			LcdSegData[2] = SegS;
 			LcdData = Humidity;		/* Humidity is 2 digits */
 			break;
 		case 0: /* PM2.5 */
@@ -308,32 +274,96 @@ void LcdRefresh(void)
 		default:
 			LcdData = 0;
 	}
-	if (LcdData < 0)
+	// render digitals
 	{
-		// If data is invalid, display "---"
-		LcdSegData[0] += DigSegTable[10];
-		LcdSegData[1] += DigSegTable[10];
-		LcdSegData[2] += DigSegTable[10];
-	}
-	else
-	{
-		if (LcdData > 999)
+		if(LcdData>=0)
 		{
-			hundred = 9;
-			ten = 9;
-			digit = 9;
+			if (LcdData > 999)
+			{
+				hundred = 9;
+				ten = 9;
+				digit = 9;
+			}
+			else
+			{
+				hundred = LcdData / 100;
+				ten = (LcdData % 100) / 10;
+				digit = LcdData % 10;
+			}
+			if ((hundred != 0))
+			{
+				LcdSegData[0] += DigSegTable[hundred];
+			}
+			if(hundred != 0 || ten!=0)
+			{
+				LcdSegData[1] += DigSegTable[ten];
+			}
+			LcdSegData[2] += DigSegTable[digit];
 		}
 		else
 		{
-			hundred = LcdData / 100;
-			ten = (LcdData % 100) / 10;
-			digit = LcdData % 10;
+			LcdSegData[0]+=DigSegTable[10];
+			if(LcdData<-99)
+			{
+				ten=9;digit=9;
+			}
+			else
+			{
+				ten=(-LcdData)/10;
+				digit=(-LcdData) % 10;
+			}
+			if(ten!=0) LcdSegData[1] += DigSegTable[ten];
+			LcdSegData[2] += DigSegTable[digit];
 		}
-		if ((hundred != 0) || (DataType == 0))
+
+	}
+}
+static void LcdRefresh(void)
+{
+	// LCD refresh
+	COM3=0;	
+	COM2=0;	
+	COM1=0;	
+	COM0=0;	
+	SEG0=0;	
+	SEG1=0;
+	SEG2=0;
+	SEG3=0;
+	SEG4=0;
+	SEG5=0;	
+	SEG0 = (LcdSegData[0] & (0b00001000 >>com_status))? 1 : 0;
+	SEG1 = (LcdSegData[0] & (0b10000000 >>com_status))? 1 : 0;
+	SEG2 = (LcdSegData[1] & (0b00001000 >>com_status))? 1 : 0;
+	SEG3 = (LcdSegData[1] & (0b10000000 >>com_status))? 1 : 0;
+	SEG4 = (LcdSegData[2] & (0b00001000 >>com_status))? 1 : 0;
+	SEG5 = (LcdSegData[2] & (0b10000000 >>com_status))? 1 : 0;
+	switch(com_status)	
+	{
+		case 0:
 		{
-			LcdSegData[0] += DigSegTable[hundred];
+			COM0=1;	
+			break;		
 		}
-		LcdSegData[1] += DigSegTable[ten];
-		LcdSegData[2] += DigSegTable[digit];
+		case 1:
+		{
+			COM1=1;	
+			break;		
+		}
+		case 2:
+		{
+			COM2=1;			
+			break;		
+		}
+		case 3:
+		{
+			COM3=1;
+			_frame=~_frame;
+			break;		
+		}
+	}
+	com_status++;
+	if(com_status>3)
+	{
+		com_status=0;
 	}
 }
