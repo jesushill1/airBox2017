@@ -119,8 +119,8 @@ DEFINE_ISR (Interrupt_CTM0A, 0x14)  //1ms
 //=======UART接收中断===============
 DEFINE_ISR (Interrupt_Uart, 0x2c)
 {
-	//if(_rxif&&!_oerr&&!_ferr&&!_nf)
-	if(_rxif)
+	if(_rxif&&!_oerr&&!_ferr&&!_nf)
+	//if(_rxif)
 	{	
 		unsigned char data;
         // store byte
@@ -162,7 +162,7 @@ DEFINE_ISR (Interrupt_Uart, 0x2c)
             // wait app to handle the frame
         }
 	}
-	//_acc=_usr;
+	_acc=_usr;
 }
 void USER_PROGRAM_INITIAL()
 {	
@@ -225,21 +225,17 @@ void USER_PROGRAM_INITIAL()
 void UATR_SEND_DATA()                    //UART数据发送
 {
 	unsigned char i;
-//	if(send_data_flag)
-//	{
-//		send_data_flag=0;
-		for(i=0;i<5;i++)
+	for(i=0;i<5;i++)
+	{
+		while(!_txif)
 		{
-			while(!_txif)
-			{
-				GCC_CLRWDT();
-				GCC_CLRWDT1();
-				GCC_CLRWDT2();
-			}		
-			_acc=_usr;
-			_txr_rxr=UartRxBuf[i];		
-		}
-/*	}*/
+			GCC_CLRWDT();
+			GCC_CLRWDT1();
+			GCC_CLRWDT2();
+		}		
+		_acc=_usr;
+		_txr_rxr=UartTxBuf[i];		
+	}
 }
 void USER_PROGRAM()
 {
@@ -308,6 +304,14 @@ void USER_PROGRAM()
                 //LIGHT = !LIGHT;
             }
             break;
+        case 40:
+        	UartTxBuf[0]=0x01;
+        	UartTxBuf[1]=0x02;
+        	UartTxBuf[2]=0x03;
+        	UartTxBuf[3]=0x04;
+        	UartTxBuf[4]=0x05;
+        	UATR_SEND_DATA();
+        	break;
 		case 90:
 			LcdDataRefresh();
 			break;
