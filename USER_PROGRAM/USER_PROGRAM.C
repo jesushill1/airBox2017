@@ -1,21 +1,22 @@
 #include    "USER_PROGRAM.H"  
 #include    "bittype.h"
 #include    "p0TmpHumSensor.h"
-#define     TOUCH_IOPU   _pcpu4
-#define     TOUCH_IOC    _pcc4
-#define     TOUCH_IO     _pc4                            //TOUCH按键状态输出脚
-#define     LIGHT        _pc2
+#define     TOUCH_IOPU  _pcpu4
+#define     TOUCH_IOC   _pcc4
+#define     TOUCH_IO    _pc4        //TOUCH按键状态输出脚
+#define     LIGHT       _pc2
+#define	    FANFBK      _pc6        //FAN feedback
 //==================================================
-#define     COM0         _pa1
-#define     COM1         _pa4
-#define     COM2         _pa0
-#define     COM3         _pa2
-#define     SEG0         _pb0
-#define     SEG1         _pb1
-#define     SEG2         _pb2
-#define     SEG3         _pb3
-#define     SEG4         _pb4
-#define     SEG5         _pb5
+#define     COM0        _pa1
+#define     COM1        _pa4
+#define     COM2        _pa0
+#define     COM3        _pa2
+#define     SEG0        _pb0
+#define     SEG1        _pb1
+#define     SEG2        _pb2
+#define     SEG3        _pb3
+#define     SEG4        _pb4
+#define     SEG5        _pb5
 
 #define RX_BUF_LEN (11)
 #define TX_BUF_LEN (5)
@@ -30,6 +31,7 @@ volatile flag_type gv8u_flag1;
 #define  KeyLongPressed   gv8u_flag1.bits.bit2
 #define  KeyShortPressed   gv8u_flag1.bits.bit3
 #define  KeyLongPressHold   gv8u_flag1.bits.bit4
+#define FanFbkZ     gv8u_flag1.bits.bit5
 
 #define  LONG_PRESS_TIME  3000
 #define  SHORT_PRESS_TIME 200
@@ -41,14 +43,17 @@ static volatile int 			LcdData 		__attribute__((at(0x386)));
 static volatile int 			Temperature 	__attribute__((at(0x388)));
 static volatile unsigned int 	DustWeight 		__attribute__((at(0x38a)));
 static volatile unsigned int 	Humidity 		__attribute__((at(0x39c)));
+
+// Fan related
+static volatile unsigned int    FanSpd          __attribute__((at(0x3B0)));
+static volatile unsigned char   FanSpdCnt;
+static volatile unsigned int    FanSpdCntTmr;
 // RS232 related
 static volatile unsigned char	UartRxWaitTmr;
 static volatile unsigned char	UartRxFrameCrc;
-volatile unsigned char  UartRxBuf[RX_BUF_LEN];
-volatile unsigned char  UartRxData[RX_BUF_LEN]; 
-volatile unsigned char  tx_databuf[TX_BUF_LEN];
-volatile unsigned char  tx_data[TX_BUF_LEN]; 
-volatile unsigned char  UartRxBufCnt;
+volatile  unsigned char         UartRxBuf[RX_BUF_LEN];
+volatile unsigned char          UartTxBuf[TX_BUF_LEN];
+volatile unsigned char          UartRxBufCnt;
 
 
 
@@ -94,20 +99,36 @@ inline void DHT11_PinRelease()
 //**********************************************
 //==============================================
 //=====CTM0定时器中断===============
-DEFINE_ISR (Interrupt_CTM0A, 0x14)  //2ms
+DEFINE_ISR (Interrupt_CTM0A, 0x14)  //1ms
 {
-
-	//LcdRefresh();
+    // Count the rise edge
+    if (FANFBK == 1 && FanFbkZ == 0)
+    {
+        FanSpdCnt++;
+    }
+    FanFbkZ = FANFBK;
+    // Periodically store the count as fan speed per 1s
+    FanSpdCntTmr++;
+    if (FanSpdCntTmr >= 1000)
+    {
+        FanSpd = FanSpdCnt;
+        FanSpdCnt = 0;
+        FanSpdCntTmr = 0;
+    }
 }
 //=======UART接收中断===============
 DEFINE_ISR (Interrupt_Uart, 0x2c)
 {
-	if(_rxif&&!_oerr&&!_ferr&&!_nf)
+	//if(_rxif&&!_oerr&&!_ferr&&!_nf)
+	if(_rxif)
 	{	
 		unsigned char data;
+        // store byte
 		data=_txr_rxr;
 		
+		// reset timeout timer
 		UartRxWaitTmr = 0;
+        // if it is the first byte
 		if(UartRxBufCnt==0)
 		{
 			if(data==0xA5)
@@ -115,35 +136,34 @@ DEFINE_ISR (Interrupt_Uart, 0x2c)
 				UartRxBuf[0]=data;
 				UartRxBufCnt=1;
 				UartRxFrameCrc = 0;
-				LIGHT = !LIGHT;
+                
 			}
 		}
-		else if(UartRxBufCnt<RX_BUF_LEN-1)
+        else if(UartRxBufCnt<(RX_BUF_LEN-1))
 		{
 			UartRxBuf[UartRxBufCnt]=data;
 			UartRxFrameCrc+=data;
 			UartRxBufCnt++;
 		}
-		else //(UartRxBufCnt==RX_BUF_LEN-1)
+        else if(UartRxBufCnt==RX_BUF_LEN-1)
 		{
 			UartRxBuf[RX_BUF_LEN-1]=data;
 			if(data==UartRxFrameCrc)
 			{
-				int i;
-				for(i=0;i<RX_BUF_LEN;i++)
-				{
-					UartRxData[i]=UartRxBuf[i];
-				}
-				
+                UartRxBufCnt = RX_BUF_LEN;
 			}
-			UartRxBufCnt=0;
+            else // invalid frame, discard
+            {
+                UartRxBufCnt = 0;
+            }
 		}
+        else // >=RX_BUF_LEN
+        {
+            // wait app to handle the frame
+        }
 	}
 	//_acc=_usr;
 }
-//==============================================
-//**********************************************
-//==============================================
 void USER_PROGRAM_INITIAL()
 {	
 	_papu=0;
@@ -165,6 +185,7 @@ void USER_PROGRAM_INITIAL()
                         // pc5: RXD2
                         // pc6: FAN feedback
                         // pc7: TXD2
+    _pcpu6 = 1;
 	
 	//=====CTM0初始化============
 	_ctm0c0=0x20;   //fsys/16
@@ -176,7 +197,7 @@ void USER_PROGRAM_INITIAL()
 	_ctma0e=1;
 	
 	//=====UART初始化============
-	_brg=12;                              //9600波特率
+	_brg=25;                              //9600波特率
 	_ucr1=0b10000000;
 	_ucr2=0b11000100;	   
 	_uartf=0;
@@ -201,9 +222,6 @@ void USER_PROGRAM_INITIAL()
     //
     UartRxBufCnt = 0;
 }
-//==============================================
-//**********************************************
-//==============================================
 void UATR_SEND_DATA()                    //UART数据发送
 {
 	unsigned char i;
@@ -219,17 +237,13 @@ void UATR_SEND_DATA()                    //UART数据发送
 				GCC_CLRWDT2();
 			}		
 			_acc=_usr;
-			_txr_rxr=tx_databuf[i];		
+			_txr_rxr=UartRxBuf[i];		
 		}
 /*	}*/
 }
-//==============================================
-//**********************************************
-//==============================================
 void USER_PROGRAM()
 {
 	static unsigned char cnt=0;
-	static unsigned char st=0;
 	if(SCAN_CYCLEF) //50ms
 	{
 		cnt++; 
@@ -279,29 +293,34 @@ void USER_PROGRAM()
 		{
 		case 0:
 			DHT11_PinPullLow();
-			LIGHT=0;
 			break;
 		case 20:
 			DHT11_PinRelease();
 			TmpHumRead(&Temperature, &Humidity);
+			Humidity=FanSpd;
 			break;
-		case 2:
+        case 30:
+            if (UartRxBufCnt == RX_BUF_LEN)
+            {
+                DustWeight = UartRxBuf[4];
+                DustWeight <<= 16;
+                DustWeight += UartRxBuf[3];
+                //LIGHT = !LIGHT;
+            }
+            break;
+		case 90:
 			LcdDataRefresh();
 			break;
-		case 3:
-			FanSpeedRead();
-			break;
-		case 4:
-			FanSpeedSet();
-			break;
-		case 19:
+        case 99:
+            UartRxWaitTmr++;
+            if (UartRxWaitTmr>5 && UartRxBufCnt != RX_BUF_LEN)
+            {
+            	
+                UartRxBufCnt = 0;
+                UartRxWaitTmr = 0;
+            }
+            break;
 		default:
-			UartRxWaitTmr++;
-			if(UartRxWaitTmr>2)
-			{
-				UartRxFrameNull =1;
-				//UartRxBufCnt=0;
-			}
 			GCC_CLRWDT();
 			GCC_CLRWDT1();
 			GCC_CLRWDT2();
@@ -429,10 +448,4 @@ void LcdRefresh(void)
 	{
 		com_status=0;
 	}
-}
-void FanSpeedRead()
-{
-}
-void FanSpeedSet()
-{
 }

@@ -68,7 +68,7 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 	/* Release data line, wait 50us and check ACK (DHT11 pull low) */
 	//DHT11_PinRelease();
 	Delay_us(50);
-	LIGHT=0;
+
 	if (DHT11_PinValue() == Bit_SET)
 	{
 		/* no ACK, terminate read */
