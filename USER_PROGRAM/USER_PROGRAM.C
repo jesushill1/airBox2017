@@ -301,6 +301,7 @@ void USER_PROGRAM()
                 DustWeight = UartRxBuf[4];
                 DustWeight <<= 16;
                 DustWeight += UartRxBuf[3];
+                UartRxBufCnt=0;
                 //LIGHT = !LIGHT;
             }
             break;
