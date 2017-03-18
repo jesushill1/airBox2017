@@ -233,7 +233,7 @@ void USER_PROGRAM()
 	if(SCAN_CYCLEF) //50ms
 	{
 		cnt++; 
-		if(cnt>=20) cnt=0;
+		if(cnt>=100) cnt=0;
 		
    		GET_KEY_BITMAP();
    		KeyPressed = DATA_BUF[1]&0b00000010 ? 1 : 0;
@@ -274,39 +274,42 @@ void USER_PROGRAM()
    		}
    		LcdRefresh();
 
+		// state machine, in every 10ms
+		switch(cnt)
+		{
+		case 0:
+			DHT11_PinPullLow();
+			LIGHT=0;
+			break;
+		case 20:
+			DHT11_PinRelease();
+			TmpHumRead(&Temperature, &Humidity);
+			break;
+		case 2:
+			LcdDataRefresh();
+			break;
+		case 3:
+			FanSpeedRead();
+			break;
+		case 4:
+			FanSpeedSet();
+			break;
+		case 19:
+		default:
+			UartRxWaitTmr++;
+			if(UartRxWaitTmr>2)
+			{
+				UartRxFrameNull =1;
+				//UartRxBufCnt=0;
+			}
+			GCC_CLRWDT();
+			GCC_CLRWDT1();
+			GCC_CLRWDT2();
+			break;
+		}
     }
     
-	switch(cnt)
-	{
-	case 0:
-		DHT11_PinPullLow();
-		break;
-	case 1:
-		DHT11_PinRelease();
-		//TmpHumRead(&Temperature, &Humidity);
-		break;
-	case 2:
-		LcdDataRefresh();
-		break;
-	case 3:
-		FanSpeedRead();
-		break;
-	case 4:
-		FanSpeedSet();
-		break;
-	case 19:
-	default:
-		UartRxWaitTmr++;
-		if(UartRxWaitTmr>2)
-		{
-			UartRxFrameNull =1;
-			//UartRxBufCnt=0;
-		}
-		GCC_CLRWDT();
-		GCC_CLRWDT1();
-		GCC_CLRWDT2();
-		break;
-	}
+
 
 }
 

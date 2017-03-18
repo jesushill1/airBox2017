@@ -13,7 +13,7 @@ INCLUDE BS82C16A-3.INC
 ;------------------------
 ;-DEFINE SYSTEM CLOCK   -
 ;------------------------
-#define SystemClock             0       ;0=8MHZ
+#define SystemClock             2       ;0=8MHZ
                                         ;1=12MHZ
                                         ;2=16MHZ
 
@@ -22,7 +22,7 @@ INCLUDE BS82C16A-3.INC
 ;-TOUCH KEY LIBRARY VARIES DEFINE
 ;--------------------------------
 ;-numeric operate ; range 0 ~ 15;                                            
-#define DebounceTimes           0       ; 30+10*n ms  
+#define DebounceTimes           1       ; 30+10*n ms  
 
 ;-numeric operate ; range 0 ~ 15; function: Time period to calibrate                   
 #define AutoCalibrationPeriod   7       ;auto calibration period select 0=80ms .....15=1280ms

@@ -15,12 +15,13 @@ inline unsigned char DHT11_PinValue()
 static volatile unsigned char 	dht11_status 		__attribute__((at(0x3a0)));
 static volatile unsigned char 	TmpHumReadErrCnt 	__attribute__((at(0x3a1)));
 
-#define Delay_us(us)  GCC_DELAY(us*2)
+#define Delay_us(us)  GCC_DELAY(us*4)
 
 
 static unsigned DHT11_ReadByte(void)
 {
-	unsigned char i, count, value = 0;
+	unsigned char i, value = 0;
+	unsigned int count;
 	dht11_status = OK;
 	for (i=0; i<8; i++)
 	{
@@ -56,8 +57,9 @@ static unsigned DHT11_ReadByte(void)
 }
 void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 {
-	unsigned char i, count, check_value=0;
+	unsigned char i, check_value=0;
 	unsigned char value_array[5];
+	unsigned int count;
 	
 	/* Pull data low more than 18 ms */
 	//DHT11_PinPullLow();
@@ -66,6 +68,7 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 	/* Release data line, wait 50us and check ACK (DHT11 pull low) */
 	//DHT11_PinRelease();
 	Delay_us(50);
+	LIGHT=0;
 	if (DHT11_PinValue() == Bit_SET)
 	{
 		/* no ACK, terminate read */
