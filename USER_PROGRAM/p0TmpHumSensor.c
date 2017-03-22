@@ -1,28 +1,28 @@
-#include    "USER_PROGRAM.H" 
+#include    "USER_PROGRAM.H"
 #include    "p0TmpHumSensor.h"
-#define Bit_RESET 0
-#define Bit_SET 1
-#define OK 1
-#define ERROR 0
-#define DHT11_TIMEOUT 400		/* 100 us time out constant */
-#define     LIGHT        _pc2
 
+#define		Bit_RESET		0
+#define 	Bit_SET 		1
+#define 	OK 				1
+#define 	ERROR 			0
+#define 	DHT11_TIMEOUT	400	/* 100 us time out constant */
+#define     LIGHT        	_pc2
+#define 	Delay_us(us)  	GCC_DELAY(us*4)
+
+static volatile unsigned char 	dht11_status 		__attribute__((at(0x3a0)));
+static volatile unsigned char 	TmpHumReadErrCnt 	__attribute__((at(0x3a1)));
 
 inline unsigned char DHT11_PinValue()
 {
     return _pc3;
 }
-static volatile unsigned char 	dht11_status 		__attribute__((at(0x3a0)));
-static volatile unsigned char 	TmpHumReadErrCnt 	__attribute__((at(0x3a1)));
-
-#define Delay_us(us)  GCC_DELAY(us*4)
-
 
 static unsigned DHT11_ReadByte(void)
 {
 	unsigned char i, value = 0;
 	unsigned int count;
 	dht11_status = OK;
+	
 	for (i=0; i<8; i++)
 	{
 		value <<= 1;	/* MSB first */
@@ -53,13 +53,15 @@ static unsigned DHT11_ReadByte(void)
 			}
 		}
 	}
+	
 	return (value);
 }
+
 void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 {
 	unsigned char i, check_value=0;
 	unsigned char value_array[5];
-	unsigned int count;
+	unsigned int  count;
 	
 	/* Pull data low more than 18 ms */
 	//DHT11_PinPullLow();
@@ -68,7 +70,7 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 	/* Release data line, wait 50us and check ACK (DHT11 pull low) */
 	//DHT11_PinRelease();
 	Delay_us(50);
-
+	
 	if (DHT11_PinValue() == Bit_SET)
 	{
 		/* no ACK, terminate read */
@@ -87,7 +89,8 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 			//LIGHT=0;
 			return;
 		}
-		/* Wait until DHT11 pull data line low for first bit*/
+		
+		/* Wait until DHT11 pull data line low for first bit */
 		count = 0;		
 		while ((DHT11_PinValue() == Bit_SET) && (count++  < DHT11_TIMEOUT));
 		if (count >= DHT11_TIMEOUT)
@@ -112,10 +115,11 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 				check_value += value_array[i];
 			}
 		}
+		
 		if (check_value == value_array[4])
 		{
 			*pTemperature = value_array[2];
-			*pHumidity 		= value_array[0];
+			*pHumidity 	  = value_array[0];
 			//LIGHT=0;
 			return;
 		}
@@ -124,5 +128,7 @@ void TmpHumRead(volatile int* pTemperature, volatile unsigned int * pHumidity)
 			//LIGHT=0;
 			return;
 		}
-	}	
+		
+	}
+	
 }

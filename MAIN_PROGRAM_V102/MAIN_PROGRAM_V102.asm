@@ -103,7 +103,7 @@ MAIN_PROGRAM    .SECTION          'CODE'
 PROGRAM_RESET:  ;;* PROGRAM ENTRY *******
                 ;;***********************
         ifdef   PBP
-                ifndef  ESCpowerIDcheck
+                ifndef  ESCpowerIDcheck		
                 SNZ     TO
                 MOV     POR_ID[0],A
                 endif
